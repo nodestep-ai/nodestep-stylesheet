@@ -1,0 +1,1372 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>nodestep-stylesheet</title>
+    <script>
+      (() => {
+        try {
+          const stored = localStorage.getItem("nodestep-theme");
+          if (stored === "light" || stored === "dark") return;
+          const older = JSON.parse(localStorage.getItem(`${new URL("../", location).pathname}.__palette`));
+          const scheme = older?.color?.scheme;
+          if (scheme === "default") localStorage.setItem("nodestep-theme", "light");
+          if (scheme === "slate") localStorage.setItem("nodestep-theme", "dark");
+        } catch {}
+      })();
+    </script>
+    <script src="nodestep-theme.js"></script>
+    <script src="nodestep-data.js"></script>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="nodestep.css">
+    <style>
+      .demo-swatches {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+        gap: var(--nodestep-space-3);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .demo-swatch {
+        display: flex;
+        flex-direction: column;
+        gap: var(--nodestep-space-1);
+        font-size: var(--nodestep-text-xs);
+        color: var(--nodestep-color-text-secondary);
+      }
+      .demo-swatch span:first-child {
+        height: 2.5rem;
+        border: var(--nodestep-border);
+        border-radius: var(--nodestep-radius);
+      }
+      .demo-type p {
+        margin: 0 0 var(--nodestep-space-2);
+        line-height: var(--nodestep-leading-tight);
+      }
+      .demo-type code {
+        display: inline-block;
+        min-width: 7rem;
+        font-size: var(--nodestep-text-xs);
+        color: var(--nodestep-color-text-muted);
+      }
+      .demo-scale {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: var(--nodestep-space-2) var(--nodestep-space-4);
+        align-items: center;
+        font-size: var(--nodestep-text-sm);
+      }
+      .demo-scale dd {
+        height: 0.75rem;
+        margin: 0;
+        background: var(--nodestep-color-accent);
+        border-radius: 2px;
+      }
+      .demo-radii {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--nodestep-space-4);
+        font-size: var(--nodestep-text-xs);
+        color: var(--nodestep-color-text-secondary);
+      }
+      .demo-radii span {
+        display: grid;
+        place-items: end start;
+        width: 5.5rem;
+        height: 3.5rem;
+        padding: var(--nodestep-space-1) var(--nodestep-space-2);
+        background: var(--nodestep-color-surface);
+        border: var(--nodestep-border-strong);
+      }
+      .demo-frame {
+        padding-block: var(--nodestep-space-3);
+        background: var(--nodestep-color-sunk);
+        border-radius: var(--nodestep-radius);
+      }
+      .demo-frame > .nodestep-page {
+        padding-block: var(--nodestep-space-3);
+        background: var(--nodestep-color-surface);
+        border: var(--nodestep-border-width) dashed var(--nodestep-color-border-strong);
+      }
+      .demo-box {
+        padding: var(--nodestep-space-2) var(--nodestep-space-3);
+        font-size: var(--nodestep-text-sm);
+        background: var(--nodestep-color-surface);
+        border: var(--nodestep-border);
+        border-radius: var(--nodestep-radius);
+      }
+      .demo-app {
+        height: 24rem;
+        border: var(--nodestep-border);
+        border-radius: var(--nodestep-radius-large);
+      }
+      .demo-bar {
+        contain: paint;
+        border: var(--nodestep-border);
+        border-radius: var(--nodestep-radius-large);
+      }
+      .demo-chat {
+        height: 36rem;
+        overflow: hidden;
+        background: var(--nodestep-color-page);
+        border: var(--nodestep-border);
+        border-radius: var(--nodestep-radius-large);
+      }
+      .demo-charts svg {
+        width: 100%;
+        height: auto;
+      }
+      .demo-chart-tooltip {
+        transform: translate(12px, -50%);
+      }
+      .demo-graphs {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+        gap: var(--nodestep-space-4);
+      }
+      .demo-graphs figure {
+        display: flex;
+        flex-direction: column;
+        gap: var(--nodestep-space-2);
+        margin: 0;
+      }
+      .demo-graphs figcaption {
+        font-size: var(--nodestep-text-sm);
+        color: var(--nodestep-color-text-secondary);
+      }
+      .demo-graphs svg {
+        width: 100%;
+        height: 20rem;
+      }
+      .demo-graphs svg p {
+        margin: 0;
+      }
+      .demo-graphs text {
+        font-size: 14px;
+      }
+      .demo-graphs foreignObject div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        font-size: 12px;
+        line-height: 1;
+      }
+      html,
+      body {
+        background: var(--nodestep-color-surface);
+      }
+      body > .nodestep-topbar {
+        flex-wrap: nowrap;
+        column-gap: var(--nodestep-space-5);
+        padding-block: 0;
+      }
+      body > .nodestep-topbar .nodestep-brand {
+        line-height: 3rem;
+      }
+      .demo-menu {
+        display: none;
+        flex: none;
+        width: 2.5rem;
+        height: 2.5rem;
+        padding: var(--nodestep-space-2);
+        color: var(--nodestep-color-text);
+        cursor: pointer;
+        background: transparent;
+        border: 0;
+        border-radius: var(--nodestep-radius);
+      }
+      .demo-menu:hover {
+        background: var(--nodestep-color-sunk);
+      }
+      .demo-menu svg,
+      .demo-repository svg {
+        display: block;
+        fill: currentColor;
+      }
+      .demo-menu svg {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+      .demo-repository {
+        display: flex;
+        flex: none;
+        gap: var(--nodestep-space-2);
+        align-items: center;
+        margin-inline-start: calc((var(--nodestep-control-height) - 1.125rem) / 2);
+        font-size: var(--nodestep-text-sm);
+        line-height: 1.2;
+        color: var(--nodestep-color-text-secondary);
+        text-decoration: none;
+        white-space: nowrap;
+      }
+      .demo-repository:hover {
+        color: var(--nodestep-color-text);
+      }
+      .demo-repository svg {
+        width: 1rem;
+        height: 1rem;
+      }
+      .demo-layout {
+        display: grid;
+        grid-template-columns: 15.125rem minmax(0, 1fr) 15.125rem;
+        max-width: 76.25rem;
+        margin-inline: auto;
+      }
+      .demo-sidebar {
+        position: sticky;
+        top: var(--nodestep-bar-height);
+        align-self: start;
+        max-height: calc(100dvh - var(--nodestep-bar-height));
+        overflow-y: auto;
+        padding: var(--nodestep-space-5) var(--nodestep-space-4);
+        scrollbar-width: thin;
+      }
+      .demo-sidebar-group {
+        margin: 0 0 0.375rem;
+        font-size: var(--nodestep-text-xs);
+        font-weight: var(--nodestep-weight-strong);
+        line-height: 1.3;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--nodestep-color-text-secondary);
+      }
+      .demo-sidebar-list + .demo-sidebar-group {
+        margin-top: 1.5rem;
+      }
+      .demo-sidebar-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        border-inline-start: var(--nodestep-border);
+      }
+      .demo-sidebar-list a {
+        display: block;
+        margin-inline-start: calc(-1 * var(--nodestep-border-width));
+        padding: 0.3125rem 0 0.3125rem 0.75rem;
+        font-size: var(--nodestep-text-sm);
+        line-height: 1.3;
+        color: var(--nodestep-color-text);
+        text-decoration: none;
+      }
+      .demo-sidebar-list a:hover {
+        color: var(--nodestep-color-accent-text);
+      }
+      .demo-sidebar-list a[aria-current="true"] {
+        color: var(--nodestep-color-accent-text);
+        box-shadow: inset 3px 0 0 var(--nodestep-color-accent);
+      }
+      .demo-sidebar-list a[aria-current="true"]:focus-visible {
+        box-shadow: inset 3px 0 0 var(--nodestep-color-accent), var(--nodestep-focus-halo);
+      }
+      .demo-main {
+        max-width: none;
+        padding-inline: var(--nodestep-space-5);
+      }
+      @media (max-width: 40rem) {
+        .demo-site-links {
+          display: none;
+        }
+      }
+      @media (width < 76.25rem) {
+        .demo-layout {
+          grid-template-columns: minmax(0, 1fr) 15.125rem;
+        }
+        .demo-menu {
+          display: block;
+        }
+        body > .nodestep-topbar .nodestep-brand-mark {
+          display: none;
+        }
+        .demo-sidebar {
+          position: fixed;
+          inset: var(--nodestep-bar-height) auto 0 0;
+          z-index: 20;
+          align-self: stretch;
+          display: none;
+          width: 15.125rem;
+          max-height: none;
+          background: var(--nodestep-color-surface);
+          border-inline-end: var(--nodestep-border);
+          box-shadow: var(--nodestep-shadow-overlay);
+        }
+        .demo-sidebar[data-open] {
+          display: block;
+        }
+        .demo-main {
+          padding-inline: var(--nodestep-space-4);
+        }
+      }
+      @media (width < 60rem) {
+        .demo-layout {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .demo-repository {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+<a class="nodestep-skip-link" href="#content">Skip to content</a>
+<header class="nodestep-topbar">
+  <button class="demo-menu" type="button" aria-label="Sections" aria-expanded="false" aria-controls="sections"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg></button>
+  <a class="nodestep-brand" href="https://nodestep-ai.github.io/nodestep/"><svg class="nodestep-brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M14 50V14L50 50V14" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="14" cy="50" r="6" fill="currentColor"></circle><circle cx="14" cy="14" r="6" fill="currentColor"></circle><circle cx="50" cy="50" r="6" fill="currentColor"></circle><circle class="nodestep-mark-accent-fill" cx="50" cy="14" r="7"></circle></svg>docs</a>
+  <nav class="demo-site-links" aria-label="Site">
+    <ul class="nodestep-nav">
+      <li><a href="https://nodestep-ai.github.io/nodestep/">nodestep</a></li>
+      <li><a href="https://nodestep-ai.github.io/nodestep/nodeartifact/">nodeartifact</a></li>
+      <li><a href="./" aria-current="page">stylesheet</a></li>
+    </ul>
+  </nav>
+  <div class="nodestep-topbar-end">
+    <form class="nodestep-search" action="https://nodestep-ai.github.io/nodestep/" role="search">
+      <label class="nodestep-search-icon" for="docs-search"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg></label>
+      <input class="nodestep-search-input" id="docs-search" type="search" name="q" placeholder="Search" aria-label="Search the docs" autocomplete="off">
+      <button class="nodestep-search-clear" type="reset" aria-label="Clear the search"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg></button>
+    </form>
+    <a class="demo-repository" href="https://github.com/nodestep-ai/nodestep-stylesheet"><svg viewBox="0 0 448 512" aria-hidden="true" focusable="false"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>nodestep-ai/nodestep-stylesheet</a>
+    <button class="nodestep-theme-button" type="button" aria-label="Dark theme" aria-pressed="false">
+      <svg class="nodestep-theme-moon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M7.14 2.06A6 6 0 1 0 13.94 8.87 5 5 0 0 1 7.14 2.06z"></path></svg>
+      <svg class="nodestep-theme-sun" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="3"></circle><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41"></path></svg>
+    </button>
+  </div>
+</header>
+<div class="demo-layout">
+<nav class="demo-sidebar" id="sections" aria-label="Sections on this page">
+  <p class="demo-sidebar-group">Get started</p>
+  <ul class="demo-sidebar-list">
+    <li><a href="#start" aria-current="true">Start</a></li>
+    <li><a href="#tokens">Tokens</a></li>
+  </ul>
+  <p class="demo-sidebar-group">Layout</p>
+  <ul class="demo-sidebar-list">
+    <li><a href="#layout">Layout</a></li>
+    <li><a href="#shell">App shell</a></li>
+    <li><a href="#theme">Theme button</a></li>
+    <li><a href="#search">Search</a></li>
+    <li><a href="#navigation">Navigation</a></li>
+  </ul>
+  <p class="demo-sidebar-group">Components</p>
+  <ul class="demo-sidebar-list">
+    <li><a href="#buttons">Buttons</a></li>
+    <li><a href="#fields">Fields</a></li>
+    <li><a href="#tables">Tables</a></li>
+    <li><a href="#data">Facts and lists</a></li>
+    <li><a href="#code">Code and SQL</a></li>
+  </ul>
+  <p class="demo-sidebar-group">Agent views</p>
+  <ul class="demo-sidebar-list">
+    <li><a href="#data-viewer">Data viewer</a></li>
+    <li><a href="#status">Status</a></li>
+    <li><a href="#timeline">Timeline</a></li>
+    <li><a href="#cards">Questions and approvals</a></li>
+    <li><a href="#chat">Chat</a></li>
+    <li><a href="#charts">Charts</a></li>
+    <li><a href="#graph">Graph</a></li>
+  </ul>
+  <p class="demo-sidebar-group">Feedback</p>
+  <ul class="demo-sidebar-list">
+    <li><a href="#empty">Empty state</a></li>
+    <li><a href="#messages">Messages and toasts</a></li>
+  </ul>
+</nav>
+<main class="nodestep-main demo-main" id="content" tabindex="-1">
+    <h1>Stylesheet 0.1.0a1</h1>
+    <p class="nodestep-lead">One stylesheet for the nodestep sandbox, nodeartifact, text-to-sql-demo and future projects. This page shows its tokens and components, each with the markup to copy.</p>
+
+    <section class="nodestep-section" id="start" aria-labelledby="start-title">
+      <h2 id="start-title">Start</h2>
+      <p class="nodestep-lead">Copy <a href="nodestep.css" download><code>nodestep.css</code></a>, <a href="nodestep-theme.js" download><code>nodestep-theme.js</code></a> and, for the data viewer, <a href="nodestep-data.js" download><code>nodestep-data.js</code></a> next to your pages. Each <a href="https://github.com/nodestep-ai/nodestep-stylesheet/releases">release</a> has them attached. There is no build step.</p>
+      <p class="nodestep-lead">Load both scripts in <code>&lt;head&gt;</code>, before the stylesheet and without <code>defer</code>, and your own stylesheet after <code>nodestep.css</code>:</p>
+      <details class="nodestep-details demo-markup" open>
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;head&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;meta name="color-scheme" content="light dark"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;script src="nodestep-theme.js"&gt;&lt;/script&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;script src="nodestep-data.js"&gt;&lt;/script&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;link rel="stylesheet" href="nodestep.css"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;link rel="stylesheet" href="app.css"&gt;</span><span class="nodestep-code-line">&lt;/head&gt;</span></code></pre></div>
+      </details>
+      <p class="nodestep-lead"><code>nodestep.css</code> declares its version in <code>--nodestep-design-version</code> on <code>:root</code>. To see which version an app has, run <code>grep nodestep-design-version nodestep.css</code> on its copy.</p>
+    </section>
+    <section class="nodestep-section" id="tokens" aria-labelledby="tokens-title">
+      <h2 id="tokens-title">Tokens</h2>
+      <p class="nodestep-lead">Every value is a custom property on <code>:root</code>. Color tokens hold a light and a dark value through <code>light-dark()</code>, so a component never needs a dark-mode rule of its own.</p>
+      <h3>Color roles</h3>
+      <p class="nodestep-lead"><code>accent</code> fills buttons, marks the current item and draws the focus ring. <code>accent-text</code> is for text and links; in the dark theme both have the same value.</p>
+      <h4>Neutral</h4>
+      <ul class="demo-swatches">
+        <li class="demo-swatch"><span style="background: var(--nodestep-color-page)"></span><code>page</code></li>
+        <li class="demo-swatch"><span style="background: var(--nodestep-color-surface)"></span><code>surface</code></li>
+        <li class="demo-swatch"><span style="background: var(--nodestep-color-sunk)"></span><code>sunk</code></li>
+        <li class="demo-swatch"><span style="background: var(--nodestep-color-border)"></span><code>border</code></li>
+        <li class="demo-swatch"><span style="background: var(--nodestep-color-border-strong)"></span><code>border-strong</code></li>
+        <li class="demo-swatch"><span style="background: var(--nodestep-color-text)"></span><code>text</code></li>
+        <li class="demo-swatch"><span style="background: var(--nodestep-color-text-secondary)"></span><code>text-secondary</code></li>
+        <li class="demo-swatch"><span style="background: var(--nodestep-color-text-muted)"></span><code>text-muted</code></li>
+        <li class="demo-swatch"><span style="background: var(--nodestep-color-on-accent)"></span><code>on-accent</code></li>
+        <li class="demo-swatch"><span style="background: var(--nodestep-color-on-danger)"></span><code>on-danger</code></li>
+      </ul>
+      <h4>Accent</h4>
+      <ul class="demo-swatches">
+        <li class="demo-swatch"><span style="background: var(--nodestep-color-accent)"></span><code>accent</code></li>
+        <li class="demo-swatch"><span style="background: var(--nodestep-color-accent-hover)"></span><code>accent-hover</code></li>
+        <li class="demo-swatch"><span style="background: var(--nodestep-color-accent-text)"></span><code>accent-text</code></li>
+        <li class="demo-swatch"><span style="background: var(--nodestep-color-accent-wash)"></span><code>accent-wash</code></li>
+      </ul>
+      <h4>Danger</h4>
+      <ul class="demo-swatches">
+        <li class="demo-swatch"><span style="background: var(--nodestep-color-danger)"></span><code>danger</code></li>
+        <li class="demo-swatch"><span style="background: var(--nodestep-color-danger-hover)"></span><code>danger-hover</code></li>
+        <li class="demo-swatch"><span style="background: var(--nodestep-color-danger-wash)"></span><code>danger-wash</code></li>
+      </ul>
+      <h3>Type scale</h3>
+      <div class="demo-type">
+        <p style="font-size: var(--nodestep-text-2xl)"><code>text-2xl</code>Trace for a stopped run</p>
+        <p style="font-size: var(--nodestep-text-xl)"><code>text-xl</code>Trace for a stopped run</p>
+        <p style="font-size: var(--nodestep-text-lg)"><code>text-lg</code>Trace for a stopped run</p>
+        <p style="font-size: var(--nodestep-text-md)"><code>text-md</code>Trace for a stopped run</p>
+        <p style="font-size: var(--nodestep-text-base)"><code>text-base</code>Trace for a stopped run</p>
+        <p style="font-size: var(--nodestep-text-sm)"><code>text-sm</code>Trace for a stopped run</p>
+        <p style="font-size: var(--nodestep-text-xs)"><code>text-xs</code>Trace for a stopped run</p>
+        <p style="font-family: var(--nodestep-font-mono); font-size: var(--nodestep-text-sm)"><code>font-mono</code>nodestep.node classify</p>
+      </div>
+      <h3>Spacing</h3>
+      <dl class="demo-scale">
+        <dt><code>space-1</code></dt><dd style="width: var(--nodestep-space-1)"></dd>
+        <dt><code>space-2</code></dt><dd style="width: var(--nodestep-space-2)"></dd>
+        <dt><code>space-3</code></dt><dd style="width: var(--nodestep-space-3)"></dd>
+        <dt><code>space-4</code></dt><dd style="width: var(--nodestep-space-4)"></dd>
+        <dt><code>space-5</code></dt><dd style="width: var(--nodestep-space-5)"></dd>
+        <dt><code>space-6</code></dt><dd style="width: var(--nodestep-space-6)"></dd>
+        <dt><code>space-7</code></dt><dd style="width: var(--nodestep-space-7)"></dd>
+        <dt><code>space-8</code></dt><dd style="width: var(--nodestep-space-8)"></dd>
+      </dl>
+      <h3>Radii</h3>
+      <div class="demo-radii">
+        <span style="border-radius: var(--nodestep-radius-small)">radius-small</span>
+        <span style="border-radius: var(--nodestep-radius)">radius</span>
+        <span style="border-radius: var(--nodestep-radius-large)">radius-large</span>
+        <span style="border-radius: var(--nodestep-radius-pill)">radius-pill</span>
+      </div>
+    </section>
+    <section class="nodestep-section" id="layout" aria-labelledby="layout-title">
+      <h2 id="layout-title">Layout</h2>
+      <p class="nodestep-lead">A page is a column of sections. Inside a section, a stack puts things under each other, a cluster puts them in a row that wraps, and a grid makes columns that fold on narrow screens. Each spaces its children with <code>gap</code> only, so their own margins do not add up.</p>
+      <h3>Page column</h3>
+      <p class="nodestep-lead"><code>nodestep-main</code> is the main area of a page: the content width, gutters on both sides and room at the top and bottom. <code>nodestep-page</code> is the same column without that room, and <code>nodestep-page-narrow</code> keeps it at a reading width, as for a chat.</p>
+      <div class="demo-frame">
+        <div class="nodestep-page nodestep-page-narrow">
+          <p class="nodestep-hint">A narrow page column: 48rem of text with the gutters around it.</p>
+        </div>
+      </div>
+      <h3>Stack, cluster and grid</h3>
+      <div class="nodestep-grid">
+        <div class="nodestep-stack nodestep-stack-small">
+          <div class="demo-box">Stack, small gap</div>
+          <div class="demo-box">One under the other</div>
+          <div class="demo-box">Children lose their margins</div>
+        </div>
+        <div class="nodestep-stack">
+          <div class="nodestep-cluster">
+            <button class="nodestep-button nodestep-button-primary nodestep-button-small" type="button">Start a run</button>
+            <button class="nodestep-button nodestep-button-secondary nodestep-button-small" type="button">New chat</button>
+            <span class="nodestep-tag">cluster</span>
+          </div>
+          <hr class="nodestep-divider">
+          <div class="nodestep-cluster nodestep-cluster-end">
+            <button class="nodestep-button nodestep-button-quiet nodestep-button-small" type="button">Cancel</button>
+            <button class="nodestep-button nodestep-button-primary nodestep-button-small" type="button">Save</button>
+          </div>
+        </div>
+        <div class="nodestep-stack nodestep-stack-large">
+          <div class="demo-box">Stack, large gap</div>
+          <div class="demo-box">For the parts of a page</div>
+        </div>
+      </div>
+      <h3>Sections and dividers</h3>
+      <p class="nodestep-lead">Every part of this page is a <code>nodestep-section</code> with a heading and <code>nodestep-lead</code> text. Two sections in a row are separated by a line, and a link to a section stops below the top bar. <code>nodestep-divider</code> is a line inside a stack or a panel.</p>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;main class="nodestep-main" id="content" tabindex="-1"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;section class="nodestep-section" aria-labelledby="runs-title"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;h2 id="runs-title"&gt;Runs&lt;/h2&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;p class="nodestep-lead"&gt;Every run of this graph, newest first.&lt;/p&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;div class="nodestep-stack"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;div class="nodestep-cluster"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;button class="nodestep-button nodestep-button-primary" type="button"&gt;Start a run&lt;/button&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;span class="nodestep-tag"&gt;12 runs&lt;/span&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;hr class="nodestep-divider"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;div class="nodestep-grid"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;section class="nodestep-card"&gt;...&lt;/section&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;section class="nodestep-card"&gt;...&lt;/section&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/section&gt;</span><span class="nodestep-code-line">&lt;/main&gt;</span><span class="nodestep-code-line">&lt;div class="nodestep-page nodestep-page-narrow"&gt;...&lt;/div&gt;</span><span class="nodestep-code-line">&lt;div class="nodestep-stack nodestep-stack-small"&gt;...&lt;/div&gt;</span><span class="nodestep-code-line">&lt;div class="nodestep-stack nodestep-stack-large"&gt;...&lt;/div&gt;</span><span class="nodestep-code-line">&lt;div class="nodestep-cluster nodestep-cluster-end"&gt;...&lt;/div&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="shell" aria-labelledby="shell-title">
+      <h2 id="shell-title">App shell</h2>
+      <p class="nodestep-lead"><code>nodestep-app</code> lays out an app: the top bar across the top, an optional panel at the start and at the end, and the main area between them. Only the page's own top bar sticks, <code>body &gt; .nodestep-topbar</code> or <code>.nodestep-app &gt; .nodestep-topbar</code>; a top bar inside content, like the examples below, stays in flow. Below 75rem the end panel folds behind a button in the top bar, and below 48rem the start panel does too. Narrow the window to try the buttons.</p>
+      <div class="nodestep-app nodestep-app-fixed demo-app" id="demo-app">
+        <div class="nodestep-topbar">
+          <span class="nodestep-brand"><svg class="nodestep-brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M14 50V14L50 50V14" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="14" cy="50" r="6" fill="currentColor"></circle><circle cx="14" cy="14" r="6" fill="currentColor"></circle><circle cx="50" cy="50" r="6" fill="currentColor"></circle><circle class="nodestep-mark-accent-fill" cx="50" cy="14" r="7"></circle></svg>text-to-sql-demo</span>
+          <div class="nodestep-topbar-end">
+            <button class="nodestep-button nodestep-button-quiet nodestep-button-small nodestep-app-toggle nodestep-app-toggle-start" type="button" aria-expanded="false" aria-controls="demo-threads" data-opens="start">Threads</button>
+            <button class="nodestep-button nodestep-button-quiet nodestep-button-small nodestep-app-toggle nodestep-app-toggle-end" type="button" aria-expanded="false" aria-controls="demo-schema" data-opens="end">Schema</button>
+          </div>
+        </div>
+        <aside class="nodestep-panel nodestep-app-start" id="demo-threads" aria-label="Threads">
+          <div class="nodestep-panel-header">
+            <h3 class="nodestep-panel-title">Threads</h3>
+            <div class="nodestep-cluster">
+              <button class="nodestep-button nodestep-button-secondary nodestep-button-small" type="button">New chat</button>
+              <button class="nodestep-button nodestep-button-quiet nodestep-button-small nodestep-app-close" type="button">Close</button>
+            </div>
+          </div>
+          <div class="nodestep-panel-body">
+            <ul class="nodestep-panel-list">
+              <li><button class="nodestep-panel-item" type="button" aria-current="true"><span class="nodestep-panel-item-line"><span class="nodestep-panel-item-title">Which ten products sold the most units?</span><span class="nodestep-panel-item-time">11:25</span></span><span class="nodestep-panel-item-meta">Demo shop</span></button></li>
+              <li><button class="nodestep-panel-item" type="button"><span class="nodestep-panel-item-line"><span class="nodestep-panel-item-title">Which category brings in the most revenue?</span><span class="nodestep-panel-item-time">11:28</span></span><span class="nodestep-panel-item-meta">Demo shop</span></button></li>
+            </ul>
+          </div>
+        </aside>
+        <div class="nodestep-app-main">
+          <div class="nodestep-main">
+            <p>Salted caramel bar sold the most units: 258 in completed orders. Dark chocolate 70% follows with 233.</p>
+          </div>
+        </div>
+        <aside class="nodestep-panel nodestep-panel-end nodestep-app-end" id="demo-schema" aria-label="Schema">
+          <div class="nodestep-panel-header">
+            <h3 class="nodestep-panel-title">Schema</h3>
+            <button class="nodestep-button nodestep-button-quiet nodestep-button-small nodestep-app-close" type="button">Close</button>
+          </div>
+          <div class="nodestep-panel-body">
+            <div class="nodestep-field">
+              <label class="nodestep-label" for="shell-database">Database</label>
+              <select class="nodestep-select" id="shell-database">
+                <option>Demo shop</option>
+                <option>Library loans</option>
+              </select>
+            </div>
+            <p class="nodestep-hint">A made-up coffee and kitchen shop with six stores and an online shop. 8 tables, 364 KB.</p>
+          </div>
+        </aside>
+      </div>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;body&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;a class="nodestep-skip-link" href="#content"&gt;Skip to content&lt;/a&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;div class="nodestep-app"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;header class="nodestep-topbar"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;a class="nodestep-brand" href="/"&gt;...&lt;/a&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;div class="nodestep-topbar-end"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;button class="nodestep-button nodestep-button-quiet nodestep-button-small nodestep-app-toggle nodestep-app-toggle-start" type="button" aria-expanded="false" aria-controls="threads"&gt;Threads&lt;/button&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;button class="nodestep-button nodestep-button-quiet nodestep-button-small nodestep-app-toggle nodestep-app-toggle-end" type="button" aria-expanded="false" aria-controls="schema"&gt;Schema&lt;/button&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;/header&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;aside class="nodestep-panel nodestep-app-start" id="threads" aria-label="Threads"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;div class="nodestep-panel-header"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;h2 class="nodestep-panel-title"&gt;Threads&lt;/h2&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;button class="nodestep-button nodestep-button-quiet nodestep-button-small nodestep-app-close" type="button"&gt;Close&lt;/button&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;div class="nodestep-panel-body"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;ul class="nodestep-panel-list"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 10">          &lt;li&gt;&lt;button class="nodestep-panel-item" type="button" aria-current="true"&gt;&lt;span class="nodestep-panel-item-line"&gt;&lt;span class="nodestep-panel-item-title"&gt;Which ten products sold the most units?&lt;/span&gt;&lt;span class="nodestep-panel-item-time"&gt;11:25&lt;/span&gt;&lt;/span&gt;&lt;span class="nodestep-panel-item-meta"&gt;Demo shop&lt;/span&gt;&lt;/button&gt;&lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;/ul&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;/aside&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;main class="nodestep-app-main nodestep-main" id="content" tabindex="-1"&gt;...&lt;/main&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;aside class="nodestep-panel nodestep-panel-end nodestep-app-end" id="schema" aria-label="Schema"&gt;...&lt;/aside&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/div&gt;</span><span class="nodestep-code-line">&lt;/body&gt;</span><span class="nodestep-code-line">&lt;div class="nodestep-app nodestep-app-fixed" data-panel="end"&gt;...&lt;/div&gt;</span></code></pre></div>
+      </details>
+      <p class="nodestep-lead">A script opens a folded panel with <code>data-panel="start"</code> or <code>data-panel="end"</code> on <code>nodestep-app</code> and sets <code>aria-expanded</code> on its button. For an app that fills the window and scrolls inside its main area, as a chat does, add <code>nodestep-app-fixed</code>. A page that only needs a top bar and a column puts <code>&lt;header class="nodestep-topbar"&gt;</code> and <code>&lt;main class="nodestep-main"&gt;</code> straight into <code>&lt;body&gt;</code>.</p>
+      <h3>Page links</h3>
+      <p class="nodestep-lead">Links to the pages of an app follow the brand in a <code>nodestep-nav</code> list. The link to the current page has <code>aria-current="page"</code>.</p>
+      <div class="nodestep-topbar demo-bar">
+        <nav aria-label="Example pages">
+          <ul class="nodestep-nav">
+            <li><a href="#shell" aria-current="page">Graph</a></li>
+            <li><a href="#shell">New run</a></li>
+            <li><a href="#shell">Threads</a></li>
+          </ul>
+        </nav>
+      </div>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;nav aria-label="Pages"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;ul class="nodestep-nav"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;li&gt;&lt;a href="/" aria-current="page"&gt;Graph&lt;/a&gt;&lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;li&gt;&lt;a href="/runs/new"&gt;New run&lt;/a&gt;&lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/ul&gt;</span><span class="nodestep-code-line">&lt;/nav&gt;</span></code></pre></div>
+      </details>
+      <h3>Brand mark</h3>
+      <p class="nodestep-lead">The nodestep sandbox, nodeartifact and text-to-sql-demo start their brand with this mark. It is decorative, so the link text is the app name.</p>
+      <div class="nodestep-cluster">
+        <span class="nodestep-brand"><svg class="nodestep-brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M14 50V14L50 50V14" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="14" cy="50" r="6" fill="currentColor"></circle><circle cx="14" cy="14" r="6" fill="currentColor"></circle><circle cx="50" cy="50" r="6" fill="currentColor"></circle><circle class="nodestep-mark-accent-fill" cx="50" cy="14" r="7"></circle></svg>nodestep</span>
+      </div>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;a class="nodestep-brand" href="/"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;svg class="nodestep-brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;path d="M14 50V14L50 50V14" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"&gt;&lt;/path&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;circle cx="14" cy="50" r="6" fill="currentColor"&gt;&lt;/circle&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;circle cx="14" cy="14" r="6" fill="currentColor"&gt;&lt;/circle&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;circle cx="50" cy="50" r="6" fill="currentColor"&gt;&lt;/circle&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;circle class="nodestep-mark-accent-fill" cx="50" cy="14" r="7"&gt;&lt;/circle&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/svg&gt;nodestep</span><span class="nodestep-code-line">&lt;/a&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="theme" aria-labelledby="theme-title">
+      <h2 id="theme-title">Theme button</h2>
+      <p class="nodestep-lead">One button switches between the light and the dark theme: a moon in the light theme, a sun in the dark theme. Its name stays "Dark theme", and <code>aria-pressed</code> says whether the dark theme is on. Until someone presses it, the page follows the system setting.</p>
+      <div class="nodestep-cluster">
+        <button class="nodestep-theme-button" type="button" aria-label="Dark theme" aria-pressed="false">
+          <svg class="nodestep-theme-moon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M7.14 2.06A6 6 0 1 0 13.94 8.87 5 5 0 0 1 7.14 2.06z"></path></svg>
+          <svg class="nodestep-theme-sun" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="3"></circle><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41"></path></svg>
+        </button>
+        <span class="nodestep-hint">Press it to switch the theme of this page.</span>
+      </div>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;button class="nodestep-theme-button" type="button" aria-label="Dark theme" aria-pressed="false"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;svg class="nodestep-theme-moon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"&gt;&lt;path d="M7.14 2.06A6 6 0 1 0 13.94 8.87 5 5 0 0 1 7.14 2.06z"&gt;&lt;/path&gt;&lt;/svg&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;svg class="nodestep-theme-sun" viewBox="0 0 16 16" aria-hidden="true" focusable="false"&gt;&lt;circle cx="8" cy="8" r="3"&gt;&lt;/circle&gt;&lt;path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41"&gt;&lt;/path&gt;&lt;/svg&gt;</span><span class="nodestep-code-line">&lt;/button&gt;</span></code></pre></div>
+      </details>
+      <p class="nodestep-lead">Load <code>nodestep-theme.js</code> in <code>&lt;head&gt;</code>, before the stylesheet and without <code>defer</code>, so the page never draws in the wrong theme first. It wires every <code>nodestep-theme-button</code>, keeps the choice in <code>localStorage</code> and works under <code>script-src 'self'</code>.</p>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;head&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;script src="nodestep-theme.js"&gt;&lt;/script&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;link rel="stylesheet" href="nodestep.css"&gt;</span><span class="nodestep-code-line">&lt;/head&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="search" aria-labelledby="search-title">
+      <h2 id="search-title">Search</h2>
+      <p class="nodestep-lead">The search field is the docs search. Put it first in <code>nodestep-topbar-end</code>, before the other controls. The clear button shows while the field holds text. As <code>type="reset"</code> it empties a field that starts empty, without a script; a page that fills in the query, as the nodeartifact trace list does, makes it a link to the page without the query. The icon is a label, so give the field an <code>id</code> and the icon its <code>for</code>. Below 60rem the field folds to its icon, and pressing the icon opens the field over the top bar. <code>nodestep-theme.js</code> keeps the focus in the field when the clear button is pressed, so the field stays open.</p>
+      <div class="nodestep-topbar demo-bar">
+        <div class="nodestep-topbar-end">
+          <form class="nodestep-search" action="../" role="search">
+            <label class="nodestep-search-icon" for="search-example"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg></label>
+            <input class="nodestep-search-input" id="search-example" type="search" name="q" placeholder="Search" aria-label="Search the example" autocomplete="off">
+            <button class="nodestep-search-clear" type="reset" aria-label="Clear the search"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg></button>
+          </form>
+        </div>
+      </div>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;form class="nodestep-search" action="/" role="search"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;label class="nodestep-search-icon" for="search"&gt;&lt;svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"&gt;&lt;path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/label&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;input class="nodestep-search-input" id="search" type="search" name="q" placeholder="Search traces" aria-label="Search traces" autocomplete="off"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;button class="nodestep-search-clear" type="reset" aria-label="Clear the search"&gt;&lt;svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"&gt;&lt;path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/button&gt;</span><span class="nodestep-code-line">&lt;/form&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="navigation" aria-labelledby="navigation-title">
+      <h2 id="navigation-title">Navigation</h2>
+      <p class="nodestep-lead">Tabs switch between views of one thing, such as the graph and the timeline of a trace. Links take <code>aria-current="page"</code>; buttons take <code>aria-current="true"</code>. Breadcrumbs show where a page sits.</p>
+      <nav aria-label="Trace views">
+        <ul class="nodestep-tabs">
+          <li><a class="nodestep-tab" href="#navigation" aria-current="page">Graph</a></li>
+          <li><a class="nodestep-tab" href="#navigation">Timeline</a></li>
+          <li><button class="nodestep-tab" type="button">Spans</button></li>
+        </ul>
+      </nav>
+      <nav aria-label="Breadcrumb">
+        <ol class="nodestep-breadcrumbs">
+          <li><a href="#navigation">Traces</a></li>
+          <li><a href="#navigation">trace <code>ff70a085</code></a></li>
+          <li aria-current="page">span <code>b65dff9b</code></li>
+        </ol>
+      </nav>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;nav aria-label="Trace views"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;ul class="nodestep-tabs"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;li&gt;&lt;a class="nodestep-tab" href="/traces/ff70a085" aria-current="page"&gt;Graph&lt;/a&gt;&lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;li&gt;&lt;a class="nodestep-tab" href="/traces/ff70a085/timeline"&gt;Timeline&lt;/a&gt;&lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/ul&gt;</span><span class="nodestep-code-line">&lt;/nav&gt;</span><span class="nodestep-code-line">&lt;nav aria-label="Breadcrumb"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;ol class="nodestep-breadcrumbs"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;li&gt;&lt;a href="/"&gt;Traces&lt;/a&gt;&lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;li aria-current="page"&gt;trace &lt;code&gt;ff70a085&lt;/code&gt;&lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/ol&gt;</span><span class="nodestep-code-line">&lt;/nav&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="buttons" aria-labelledby="buttons-title">
+      <h2 id="buttons-title">Buttons</h2>
+      <p class="nodestep-lead">One primary action per view. Secondary for the other actions, quiet for actions next to content, danger for actions that discard or refuse.</p>
+      <div class="nodestep-cluster">
+        <button class="nodestep-button nodestep-button-primary" type="button">Start a run</button>
+        <button class="nodestep-button nodestep-button-secondary" type="button">New chat</button>
+        <button class="nodestep-button nodestep-button-quiet" type="button">Edit</button>
+        <button class="nodestep-button nodestep-button-danger" type="button">Deny refund</button>
+      </div>
+      <div class="nodestep-cluster">
+        <button class="nodestep-button nodestep-button-primary" type="button" disabled>Send</button>
+        <button class="nodestep-button nodestep-button-secondary" type="button" aria-disabled="true">Resume</button>
+        <button class="nodestep-button nodestep-button-secondary" type="button" aria-pressed="true">Schema</button>
+        <button class="nodestep-button nodestep-button-quiet nodestep-button-small" type="button">Copy</button>
+        <a class="nodestep-button nodestep-button-secondary nodestep-button-small" href="#timeline">Open trace</a>
+        <button class="nodestep-button nodestep-button-secondary nodestep-button-icon" type="button" aria-label="Previous version">‹</button>
+        <button class="nodestep-button nodestep-button-quiet nodestep-button-small nodestep-button-icon" type="button" aria-label="Next version">›</button>
+      </div>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;button class="nodestep-button nodestep-button-primary" type="button"&gt;Start a run&lt;/button&gt;</span><span class="nodestep-code-line">&lt;button class="nodestep-button nodestep-button-secondary" type="button"&gt;New chat&lt;/button&gt;</span><span class="nodestep-code-line">&lt;button class="nodestep-button nodestep-button-quiet nodestep-button-small" type="button"&gt;Copy&lt;/button&gt;</span><span class="nodestep-code-line">&lt;button class="nodestep-button nodestep-button-danger" type="button"&gt;Deny refund&lt;/button&gt;</span><span class="nodestep-code-line">&lt;button class="nodestep-button nodestep-button-secondary" type="button" aria-pressed="true"&gt;Schema&lt;/button&gt;</span><span class="nodestep-code-line">&lt;button class="nodestep-button nodestep-button-secondary nodestep-button-icon" type="button" aria-label="Previous version"&gt;‹&lt;/button&gt;</span><span class="nodestep-code-line">&lt;a class="nodestep-button nodestep-button-secondary nodestep-button-small" href="/traces"&gt;Open trace&lt;/a&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="fields" aria-labelledby="fields-title">
+      <h2 id="fields-title">Fields</h2>
+      <div class="nodestep-grid">
+        <div class="nodestep-field">
+          <label class="nodestep-label" for="field-thread">Thread id</label>
+          <input class="nodestep-input" id="field-thread" type="text" placeholder="sandbox-2a9b8cd22ad5" aria-describedby="field-thread-hint">
+          <p class="nodestep-hint" id="field-thread-hint">Leave empty to start a new thread.</p>
+        </div>
+        <div class="nodestep-field">
+          <label class="nodestep-label" for="field-count">Retries</label>
+          <input class="nodestep-input" id="field-count" type="text" inputmode="numeric" value="many" aria-invalid="true" aria-describedby="field-count-error">
+          <p class="nodestep-field-error" id="field-count-error">Enter a whole number, for example 3.</p>
+        </div>
+        <div class="nodestep-field">
+          <label class="nodestep-label" for="field-mode">Stream modes</label>
+          <select class="nodestep-select" id="field-mode">
+            <option>updates, custom, debug</option>
+            <option>updates</option>
+          </select>
+        </div>
+        <div class="nodestep-field">
+          <label class="nodestep-label" for="field-locked">Model</label>
+          <input class="nodestep-input" id="field-locked" type="text" value="gpt-6-luna" disabled>
+        </div>
+      </div>
+      <div class="nodestep-field">
+        <label class="nodestep-label" for="field-state">Input state as JSON</label>
+        <textarea class="nodestep-textarea nodestep-mono" id="field-state" spellcheck="false">{"text": "I want to buy a license for my team"}</textarea>
+      </div>
+      <fieldset class="nodestep-fieldset">
+        <legend><code>approve_refund</code></legend>
+        <p class="nodestep-hint">Tool <code>issue_refund</code> asks for approval.</p>
+        <div class="nodestep-cluster">
+          <label class="nodestep-check"><input type="radio" name="decision" value="approve" checked> Approve</label>
+          <label class="nodestep-check"><input type="radio" name="decision" value="edit"> Edit the arguments</label>
+          <label class="nodestep-check"><input type="radio" name="decision" value="deny"> Deny</label>
+        </div>
+        <div class="nodestep-field">
+          <label class="nodestep-label" for="field-reason">Or describe what you mean</label>
+          <div class="nodestep-input-row">
+            <input class="nodestep-input" id="field-reason" type="text">
+            <button class="nodestep-button nodestep-button-primary" type="button">Send answer</button>
+          </div>
+        </div>
+        <label class="nodestep-check"><input type="checkbox" checked> <code>verbose</code></label>
+      </fieldset>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;div class="nodestep-field"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;label class="nodestep-label" for="retries"&gt;Retries&lt;/label&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;input class="nodestep-input" id="retries" type="text" aria-invalid="true" aria-describedby="retries-error"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;p class="nodestep-field-error" id="retries-error"&gt;Enter a whole number, for example 3.&lt;/p&gt;</span><span class="nodestep-code-line">&lt;/div&gt;</span><span class="nodestep-code-line">&lt;div class="nodestep-field"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;label class="nodestep-label" for="mode"&gt;Stream modes&lt;/label&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;select class="nodestep-select" id="mode" aria-describedby="mode-hint"&gt;...&lt;/select&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;p class="nodestep-hint" id="mode-hint"&gt;Leave as it is to see every event.&lt;/p&gt;</span><span class="nodestep-code-line">&lt;/div&gt;</span><span class="nodestep-code-line">&lt;textarea class="nodestep-textarea nodestep-mono" id="state" spellcheck="false"&gt;&lt;/textarea&gt;</span><span class="nodestep-code-line">&lt;fieldset class="nodestep-fieldset"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;legend&gt;Decision&lt;/legend&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;label class="nodestep-check"&gt;&lt;input type="radio" name="decision" value="approve"&gt; Approve&lt;/label&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;div class="nodestep-input-row"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;input class="nodestep-input" type="text" aria-label="Answer"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;button class="nodestep-button nodestep-button-primary" type="submit"&gt;Send answer&lt;/button&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/div&gt;</span><span class="nodestep-code-line">&lt;/fieldset&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="tables" aria-labelledby="tables-title">
+      <h2 id="tables-title">Tables</h2>
+      <p class="nodestep-lead">Numbers align right with tabular figures. On narrow screens a table with <code>nodestep-table-stack</code> shows each row as a list of labelled values, and a status badge keeps its own width.</p>
+      <div class="nodestep-table-wrap">
+        <table class="nodestep-table nodestep-table-stack">
+          <caption class="nodestep-visually-hidden">Recent runs</caption>
+          <thead>
+            <tr><th scope="col">Run</th><th scope="col">Status</th><th scope="col" class="nodestep-num">Steps</th><th scope="col" class="nodestep-num">Duration</th></tr>
+          </thead>
+          <tbody>
+            <tr><td data-label="Run">Revenue by store, last quarter</td><td data-label="Status"><span class="nodestep-badge nodestep-badge-completed">Completed</span></td><td data-label="Steps" class="nodestep-num">6</td><td data-label="Duration" class="nodestep-num">2.4 s</td></tr>
+            <tr aria-current="true"><td data-label="Run">Refund for order 10482</td><td data-label="Status"><span class="nodestep-badge nodestep-badge-paused">Paused</span></td><td data-label="Steps" class="nodestep-num">3</td><td data-label="Duration" class="nodestep-num">1.1 s</td></tr>
+            <tr><td data-label="Run">Top products by units</td><td data-label="Status"><span class="nodestep-badge nodestep-badge-running">Running</span></td><td data-label="Steps" class="nodestep-num">2</td><td data-label="Duration" class="nodestep-num">0.8 s</td></tr>
+            <tr><td data-label="Run">Invoice for customer 311</td><td data-label="Status"><span class="nodestep-badge nodestep-badge-failed">Failed</span></td><td data-label="Steps" class="nodestep-num">4</td><td data-label="Duration" class="nodestep-num">1.7 s</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;div class="nodestep-table-wrap"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;table class="nodestep-table nodestep-table-stack"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;caption class="nodestep-visually-hidden"&gt;Recent runs&lt;/caption&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;thead&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;tr&gt;&lt;th scope="col"&gt;Run&lt;/th&gt;&lt;th scope="col"&gt;Status&lt;/th&gt;&lt;th scope="col" class="nodestep-num"&gt;Steps&lt;/th&gt;&lt;/tr&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;/thead&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;tbody&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;tr aria-current="true"&gt;&lt;td data-label="Run"&gt;Refund for order 10482&lt;/td&gt;&lt;td data-label="Status"&gt;&lt;span class="nodestep-badge nodestep-badge-paused"&gt;Paused&lt;/span&gt;&lt;/td&gt;&lt;td data-label="Steps" class="nodestep-num"&gt;3&lt;/td&gt;&lt;/tr&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;/tbody&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/table&gt;</span><span class="nodestep-code-line">&lt;/div&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="data" aria-labelledby="data-title">
+      <h2 id="data-title">Facts and lists</h2>
+      <p class="nodestep-lead">Facts sum up a trace or a run in a row of labelled values. Pairs list keys and values in two columns that stack on narrow screens. A list shows rows of a log or of search results in one box. Details fold away what most people do not need.</p>
+      <dl class="nodestep-facts">
+        <div><dt>Status</dt><dd><span class="nodestep-badge nodestep-badge-completed">Completed</span></dd></div>
+        <div><dt>Service</dt><dd>text-to-sql-demo</dd></div>
+        <div><dt>Started</dt><dd class="nodestep-nowrap">11:25:04</dd></div>
+        <div><dt>Duration</dt><dd>2.41 s</dd></div>
+        <div><dt>Tokens in / out</dt><dd>1,840 / 212</dd></div>
+      </dl>
+      <dl class="nodestep-pairs">
+        <dt>Thread</dt><dd><code>th-c04e5519</code></dd>
+        <dt>Started</dt><dd>11:25:04</dd>
+        <dt>Stream modes</dt><dd><code>updates</code>, <code>custom</code>, <code>debug</code></dd>
+        <dt>Input</dt><dd><details class="nodestep-details"><summary>JSON</summary><div class="nodestep-code"><pre>{"text": "Which ten products sold the most units?"}</pre></div></details></dd>
+      </dl>
+      <ol class="nodestep-list" aria-label="Events">
+        <li class="nodestep-list-row">
+          <div class="nodestep-list-head"><span class="nodestep-tag">update</span><code>classify</code><span class="nodestep-hint">step 1</span><a class="nodestep-list-meta" href="#data">Task details</a></div>
+          <p class="nodestep-hint">intent: sales</p>
+        </li>
+        <li class="nodestep-list-row">
+          <div class="nodestep-list-head"><span class="nodestep-tag">custom</span><code>sales</code><span class="nodestep-list-meta">11:25:05</span></div>
+          <div class="nodestep-code nodestep-code-wrap"><pre>{"progress": "looking up orders"}</pre></div>
+        </li>
+      </ol>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;dl class="nodestep-facts"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;div&gt;&lt;dt&gt;Status&lt;/dt&gt;&lt;dd&gt;&lt;span class="nodestep-badge nodestep-badge-completed"&gt;Completed&lt;/span&gt;&lt;/dd&gt;&lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;div&gt;&lt;dt&gt;Started&lt;/dt&gt;&lt;dd class="nodestep-nowrap"&gt;11:25:04&lt;/dd&gt;&lt;/div&gt;</span><span class="nodestep-code-line">&lt;/dl&gt;</span><span class="nodestep-code-line">&lt;dl class="nodestep-pairs"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;dt&gt;Thread&lt;/dt&gt;&lt;dd&gt;&lt;code&gt;th-c04e5519&lt;/code&gt;&lt;/dd&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;dt&gt;Input&lt;/dt&gt;&lt;dd&gt;&lt;details class="nodestep-details"&gt;&lt;summary&gt;JSON&lt;/summary&gt;&lt;div class="nodestep-code"&gt;&lt;pre&gt;...&lt;/pre&gt;&lt;/div&gt;&lt;/details&gt;&lt;/dd&gt;</span><span class="nodestep-code-line">&lt;/dl&gt;</span><span class="nodestep-code-line">&lt;ol class="nodestep-list"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;li class="nodestep-list-row"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;div class="nodestep-list-head"&gt;&lt;span class="nodestep-tag"&gt;update&lt;/span&gt;&lt;code&gt;classify&lt;/code&gt;&lt;a class="nodestep-list-meta" href="/runs/r1/steps/1"&gt;Task details&lt;/a&gt;&lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;p class="nodestep-hint"&gt;intent: sales&lt;/p&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/li&gt;</span><span class="nodestep-code-line">&lt;/ol&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="code" aria-labelledby="code-title">
+      <h2 id="code-title">Code and SQL</h2>
+      <p class="nodestep-lead">Token classes come from each app's own tokenizer. With <code>nodestep-code-wrap</code>, long lines wrap with a hanging indent set by <code>--nodestep-indent</code> on each line.</p>
+      <div class="nodestep-stack">
+        <div class="nodestep-code nodestep-code-wrap">
+          <div class="nodestep-code-header">
+            <span>SQL, 10 rows in 2 ms</span>
+            <button class="nodestep-button nodestep-button-quiet nodestep-button-small" type="button" data-copy="sql-example">Copy</button>
+          </div>
+          <pre id="sql-example"><code><span class="nodestep-code-line"><span class="nodestep-token-keyword">SELECT</span></span><span class="nodestep-code-line" style="--nodestep-indent: 2">  <span class="nodestep-token-identifier">p</span><span class="nodestep-token-operator">.</span><span class="nodestep-token-identifier">name</span> <span class="nodestep-token-keyword">AS</span> <span class="nodestep-token-identifier">product</span><span class="nodestep-token-operator">,</span></span><span class="nodestep-code-line" style="--nodestep-indent: 2">  <span class="nodestep-token-function">SUM</span><span class="nodestep-token-operator">(</span><span class="nodestep-token-identifier">i</span><span class="nodestep-token-operator">.</span><span class="nodestep-token-identifier">quantity</span><span class="nodestep-token-operator">)</span> <span class="nodestep-token-keyword">AS</span> <span class="nodestep-token-identifier">units</span></span><span class="nodestep-code-line"><span class="nodestep-token-keyword">FROM</span> <span class="nodestep-token-identifier">order_items</span> <span class="nodestep-token-keyword">AS</span> <span class="nodestep-token-identifier">i</span></span><span class="nodestep-code-line"><span class="nodestep-token-keyword">JOIN</span> <span class="nodestep-token-identifier">orders</span> <span class="nodestep-token-keyword">AS</span> <span class="nodestep-token-identifier">o</span></span><span class="nodestep-code-line" style="--nodestep-indent: 2">  <span class="nodestep-token-keyword">ON</span> <span class="nodestep-token-identifier">o</span><span class="nodestep-token-operator">.</span><span class="nodestep-token-identifier">order_id</span> <span class="nodestep-token-operator">=</span> <span class="nodestep-token-identifier">i</span><span class="nodestep-token-operator">.</span><span class="nodestep-token-identifier">order_id</span></span><span class="nodestep-code-line"><span class="nodestep-token-keyword">WHERE</span></span><span class="nodestep-code-line" style="--nodestep-indent: 2">  <span class="nodestep-token-identifier">o</span><span class="nodestep-token-operator">.</span><span class="nodestep-token-identifier">status</span> <span class="nodestep-token-operator">=</span> <span class="nodestep-token-string">'completed'</span> <span class="nodestep-token-keyword">AND</span> <span class="nodestep-token-identifier">o</span><span class="nodestep-token-operator">.</span><span class="nodestep-token-identifier">ordered_at</span> <span class="nodestep-token-operator">&gt;=</span> <span class="nodestep-token-string">'2025-01-01'</span> <span class="nodestep-token-comment">-- returns are counted in their own table, so this keeps every completed order</span></span><span class="nodestep-code-line"><span class="nodestep-token-keyword">GROUP BY</span></span><span class="nodestep-code-line" style="--nodestep-indent: 2">  <span class="nodestep-token-identifier">p</span><span class="nodestep-token-operator">.</span><span class="nodestep-token-identifier">product_id</span></span><span class="nodestep-code-line"><span class="nodestep-token-keyword">ORDER BY</span></span><span class="nodestep-code-line" style="--nodestep-indent: 2">  <span class="nodestep-token-identifier">units</span> <span class="nodestep-token-keyword">DESC</span></span><span class="nodestep-code-line"><span class="nodestep-token-keyword">LIMIT</span> <span class="nodestep-token-number">10</span></span></code></pre>
+        </div>
+        <div class="nodestep-code">
+          <div class="nodestep-code-header"><span>State after step 0</span></div>
+          <pre><code><span class="nodestep-token-operator">{</span>
+  <span class="nodestep-token-string">"intent"</span><span class="nodestep-token-operator">:</span> <span class="nodestep-token-string">"sales"</span><span class="nodestep-token-operator">,</span>
+  <span class="nodestep-token-string">"attempts"</span><span class="nodestep-token-operator">:</span> <span class="nodestep-token-number">1</span><span class="nodestep-token-operator">,</span>
+  <span class="nodestep-token-string">"approved"</span><span class="nodestep-token-operator">:</span> <span class="nodestep-token-keyword">null</span>
+<span class="nodestep-token-operator">}</span></code></pre>
+        </div>
+      </div>
+      <p>Inline code reads like this: <code>nodestep sandbox app.py:graph</code>. Keys read like this: <kbd>Shift</kbd> + <kbd>Enter</kbd>.</p>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;div class="nodestep-code nodestep-code-wrap"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;div class="nodestep-code-header"&gt;&lt;span&gt;SQL, 10 rows in 2 ms&lt;/span&gt;&lt;button class="nodestep-button nodestep-button-quiet nodestep-button-small" type="button"&gt;Copy&lt;/button&gt;&lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;pre&gt;&lt;code&gt;&lt;span class="nodestep-code-line"&gt;&lt;span class="nodestep-token-keyword"&gt;SELECT&lt;/span&gt; &lt;span class="nodestep-token-function"&gt;SUM&lt;/span&gt;&lt;span class="nodestep-token-operator"&gt;(&lt;/span&gt;&lt;span class="nodestep-token-identifier"&gt;quantity&lt;/span&gt;&lt;span class="nodestep-token-operator"&gt;)&lt;/span&gt;&lt;/span&gt;&lt;span class="nodestep-code-line" style="--nodestep-indent: 2"&gt;  &lt;span class="nodestep-token-keyword"&gt;WHERE&lt;/span&gt; &lt;span class="nodestep-token-identifier"&gt;status&lt;/span&gt; &lt;span class="nodestep-token-operator"&gt;=&lt;/span&gt; &lt;span class="nodestep-token-string"&gt;'completed'&lt;/span&gt; &lt;span class="nodestep-token-keyword"&gt;LIMIT&lt;/span&gt; &lt;span class="nodestep-token-number"&gt;10&lt;/span&gt; &lt;span class="nodestep-token-comment"&gt;-- one line each&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;</span><span class="nodestep-code-line">&lt;/div&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="data-viewer" aria-labelledby="data-viewer-title">
+      <h2 id="data-viewer-title">Data viewer</h2>
+      <p class="nodestep-lead">A JSON value as a tree: objects and arrays fold and show how many keys or items they hold, and each value has the look of its type. A list of chat messages reads as one folded row per message: the role, the text on one line, or in full when it is short, and one line per tool call. A click on a row opens the whole message, and its JSON is one more click away. A search opens the rows its matches are in and counts each match once. The markup works without a script; <code>nodestep-data.js</code> adds the search, Expand all, Collapse all and Copy JSON. Search for <kbd>caramel</kbd> and press <kbd>Enter</kbd> to go from match to match, or <kbd>Shift</kbd> + <kbd>Enter</kbd> to go back.</p>
+      <div class="nodestep-stack" id="data-example">
+        <div class="nodestep-data" role="group" aria-label="the run state"><div class="nodestep-data-toolbar"><input class="nodestep-input nodestep-data-search" type="search" placeholder="Search keys and values" aria-label="Search the run state"><span class="nodestep-data-matches" aria-live="polite"></span><button class="nodestep-button nodestep-button-quiet nodestep-button-small" type="button" data-nodestep-data-action="expand">Expand all</button><button class="nodestep-button nodestep-button-quiet nodestep-button-small" type="button" data-nodestep-data-action="collapse">Collapse all</button><button class="nodestep-button nodestep-button-quiet nodestep-button-small" type="button" data-nodestep-data-action="copy">Copy JSON</button></div><div class="nodestep-data-tree"><ul class="nodestep-data-children"><li class="nodestep-data-entry"><span class="nodestep-data-key">question</span><span class="nodestep-data-value nodestep-token-string">Which ten products sold the most units?</span></li><li class="nodestep-data-entry"><span class="nodestep-data-key">attempts</span><span class="nodestep-data-value nodestep-token-number">1</span></li><li class="nodestep-data-entry"><span class="nodestep-data-key">approved</span><span class="nodestep-data-value nodestep-token-keyword">true</span></li><li class="nodestep-data-entry"><span class="nodestep-data-key">error</span><span class="nodestep-data-value nodestep-token-comment">null</span></li><li class="nodestep-data-entry"><span class="nodestep-data-key">tags</span><span class="nodestep-data-value nodestep-token-operator">[]</span></li><li class="nodestep-data-entry"><details class="nodestep-data-node" open><summary><span class="nodestep-data-key">result</span><span class="nodestep-data-size">3 keys</span></summary><ul class="nodestep-data-children"><li class="nodestep-data-entry"><details class="nodestep-data-node" open><summary><span class="nodestep-data-key">columns</span><span class="nodestep-data-size">2 items</span></summary><ol class="nodestep-data-children"><li class="nodestep-data-entry"><span class="nodestep-data-index">0</span><span class="nodestep-data-value nodestep-token-string">product</span></li><li class="nodestep-data-entry"><span class="nodestep-data-index">1</span><span class="nodestep-data-value nodestep-token-string">units</span></li></ol></details></li><li class="nodestep-data-entry"><details class="nodestep-data-node" open><summary><span class="nodestep-data-key">rows</span><span class="nodestep-data-size">2 items</span></summary><ol class="nodestep-data-children"><li class="nodestep-data-entry"><details class="nodestep-data-node"><summary><span class="nodestep-data-index">0</span><span class="nodestep-data-size">2 items</span></summary><ol class="nodestep-data-children"><li class="nodestep-data-entry"><span class="nodestep-data-index">0</span><span class="nodestep-data-value nodestep-token-string">Salted caramel bar</span></li><li class="nodestep-data-entry"><span class="nodestep-data-index">1</span><span class="nodestep-data-value nodestep-token-number">258</span></li></ol></details></li><li class="nodestep-data-entry"><details class="nodestep-data-node"><summary><span class="nodestep-data-index">1</span><span class="nodestep-data-size">2 items</span></summary><ol class="nodestep-data-children"><li class="nodestep-data-entry"><span class="nodestep-data-index">0</span><span class="nodestep-data-value nodestep-token-string">Dark chocolate 70%</span></li><li class="nodestep-data-entry"><span class="nodestep-data-index">1</span><span class="nodestep-data-value nodestep-token-number">233</span></li></ol></details></li></ol></details></li><li class="nodestep-data-entry"><details class="nodestep-data-node" open><summary><span class="nodestep-data-key">stores</span><span class="nodestep-data-size">1 item</span></summary><ol class="nodestep-data-children"><li class="nodestep-data-entry"><details class="nodestep-data-node"><summary><span class="nodestep-data-index">0</span><span class="nodestep-data-size">2 keys</span></summary><ul class="nodestep-data-children"><li class="nodestep-data-entry"><span class="nodestep-data-key">name</span><span class="nodestep-data-value nodestep-token-string">Vienna Neubau</span></li><li class="nodestep-data-entry"><span class="nodestep-data-key">orders</span><span class="nodestep-data-value nodestep-token-number">180</span></li></ul></details></li></ol></details></li></ul></details></li><li class="nodestep-data-entry"><details class="nodestep-data-node" open><summary><span class="nodestep-data-key">messages</span><span class="nodestep-data-size">5 messages</span></summary><ol class="nodestep-data-messages"><li class="nodestep-data-message"><details class="nodestep-data-message-row"><summary class="nodestep-data-message-head"><span class="nodestep-data-role nodestep-data-role-system">system</span><span class="nodestep-data-preview"><span class="nodestep-data-preview-line nodestep-data-preview-text">Answer questions about demo_shop with SQL. List the tables first and check the column names before you write a query. Count only completed orders unless the question says otherwise, and explain each result in two or three plain sentences t…</span></span></summary><div class="nodestep-data-message-body"><p class="nodestep-data-text">Answer questions about demo_shop with SQL. List the tables first and check the column names before you write a query. Count only completed orders unless the question says otherwise, and explain each result in two or three plain sentences that name the numbers.</p><details class="nodestep-data-raw"><summary>JSON</summary><ul class="nodestep-data-children"><li class="nodestep-data-entry"><span class="nodestep-data-key">id</span><span class="nodestep-data-value nodestep-token-string">m1</span></li><li class="nodestep-data-entry"><span class="nodestep-data-key">type</span><span class="nodestep-data-value nodestep-token-string">system</span></li><li class="nodestep-data-entry" data-nodestep-data-echo><span class="nodestep-data-key">content</span><span class="nodestep-data-value nodestep-token-string">Answer questions about demo_shop with SQL. List the tables first and check the column names before you write a query. Count only completed orders unless the question says otherwise, and explain each result in two or three plain sentences that name the numbers.</span></li></ul></details></div></details></li><li class="nodestep-data-message"><details class="nodestep-data-message-row"><summary class="nodestep-data-message-head"><span class="nodestep-data-role nodestep-data-role-human">human</span><span class="nodestep-data-preview"><span class="nodestep-data-preview-line nodestep-data-preview-text nodestep-data-preview-short">Which ten products sold the most units?</span></span></summary><div class="nodestep-data-message-body"><p class="nodestep-data-text">Which ten products sold the most units?</p><details class="nodestep-data-raw"><summary>JSON</summary><ul class="nodestep-data-children"><li class="nodestep-data-entry"><span class="nodestep-data-key">id</span><span class="nodestep-data-value nodestep-token-string">m2</span></li><li class="nodestep-data-entry"><span class="nodestep-data-key">type</span><span class="nodestep-data-value nodestep-token-string">human</span></li><li class="nodestep-data-entry" data-nodestep-data-echo><span class="nodestep-data-key">content</span><span class="nodestep-data-value nodestep-token-string">Which ten products sold the most units?</span></li></ul></details></div></details></li><li class="nodestep-data-message"><details class="nodestep-data-message-row"><summary class="nodestep-data-message-head"><span class="nodestep-data-role nodestep-data-role-ai">ai</span><span class="nodestep-data-preview"><span class="nodestep-data-preview-line">run_sql(sql: &#34;SELECT p.name AS product, SUM(i.quantity) AS units FROM order_items AS i JOIN products AS p ON p.product_id = i.product_id GROUP BY p.product_id ORDER BY units DESC LIMIT 10&#34;)</span></span></summary><div class="nodestep-data-message-body"><ul class="nodestep-data-calls"><li class="nodestep-data-call"><span class="nodestep-data-call-name">run_sql</span><span class="nodestep-data-call-arguments">{&#34;sql&#34;: &#34;SELECT p.name AS product, SUM(i.quantity) AS units FROM order_items AS i JOIN products AS p ON p.product_id = i.product_id GROUP BY p.product_id ORDER BY units DESC LIMIT 10&#34;}</span></li></ul><details class="nodestep-data-raw"><summary>JSON</summary><ul class="nodestep-data-children"><li class="nodestep-data-entry"><span class="nodestep-data-key">id</span><span class="nodestep-data-value nodestep-token-string">m3</span></li><li class="nodestep-data-entry"><span class="nodestep-data-key">type</span><span class="nodestep-data-value nodestep-token-string">ai</span></li><li class="nodestep-data-entry"><span class="nodestep-data-key">content</span><span class="nodestep-data-value nodestep-token-comment">null</span></li><li class="nodestep-data-entry"><details class="nodestep-data-node"><summary><span class="nodestep-data-key">tool_calls</span><span class="nodestep-data-size">1 item</span></summary><ol class="nodestep-data-children"><li class="nodestep-data-entry"><details class="nodestep-data-node"><summary><span class="nodestep-data-index">0</span><span class="nodestep-data-size">3 keys</span></summary><ul class="nodestep-data-children"><li class="nodestep-data-entry"><span class="nodestep-data-key">id</span><span class="nodestep-data-value nodestep-token-string">call_1</span></li><li class="nodestep-data-entry" data-nodestep-data-echo><span class="nodestep-data-key">name</span><span class="nodestep-data-value nodestep-token-string">run_sql</span></li><li class="nodestep-data-entry" data-nodestep-data-echo><details class="nodestep-data-node"><summary><span class="nodestep-data-key">arguments</span><span class="nodestep-data-size">1 key</span></summary><ul class="nodestep-data-children"><li class="nodestep-data-entry"><span class="nodestep-data-key">sql</span><span class="nodestep-data-value nodestep-token-string">SELECT p.name AS product, SUM(i.quantity) AS units FROM order_items AS i JOIN products AS p ON p.product_id = i.product_id GROUP BY p.product_id ORDER BY units DESC LIMIT 10</span></li></ul></details></li></ul></details></li></ol></details></li></ul></details></div></details></li><li class="nodestep-data-message"><details class="nodestep-data-message-row"><summary class="nodestep-data-message-head"><span class="nodestep-data-role nodestep-data-role-tool">tool</span><span class="nodestep-data-message-name">run_sql</span><span class="nodestep-data-preview"><span class="nodestep-data-preview-line">columns: [&#34;product&#34;, &#34;units&#34;], rows: [[&#34;Salted caramel bar&#34;, 258], [&#34;Dark chocolate 70%&#34;, 233]], row_count: 10</span></span></summary><div class="nodestep-data-message-body"><ul class="nodestep-data-children"><li class="nodestep-data-entry"><details class="nodestep-data-node"><summary><span class="nodestep-data-key">columns</span><span class="nodestep-data-size">2 items</span></summary><ol class="nodestep-data-children"><li class="nodestep-data-entry"><span class="nodestep-data-index">0</span><span class="nodestep-data-value nodestep-token-string">product</span></li><li class="nodestep-data-entry"><span class="nodestep-data-index">1</span><span class="nodestep-data-value nodestep-token-string">units</span></li></ol></details></li><li class="nodestep-data-entry"><details class="nodestep-data-node"><summary><span class="nodestep-data-key">rows</span><span class="nodestep-data-size">2 items</span></summary><ol class="nodestep-data-children"><li class="nodestep-data-entry"><details class="nodestep-data-node"><summary><span class="nodestep-data-index">0</span><span class="nodestep-data-size">2 items</span></summary><ol class="nodestep-data-children"><li class="nodestep-data-entry"><span class="nodestep-data-index">0</span><span class="nodestep-data-value nodestep-token-string">Salted caramel bar</span></li><li class="nodestep-data-entry"><span class="nodestep-data-index">1</span><span class="nodestep-data-value nodestep-token-number">258</span></li></ol></details></li><li class="nodestep-data-entry"><details class="nodestep-data-node"><summary><span class="nodestep-data-index">1</span><span class="nodestep-data-size">2 items</span></summary><ol class="nodestep-data-children"><li class="nodestep-data-entry"><span class="nodestep-data-index">0</span><span class="nodestep-data-value nodestep-token-string">Dark chocolate 70%</span></li><li class="nodestep-data-entry"><span class="nodestep-data-index">1</span><span class="nodestep-data-value nodestep-token-number">233</span></li></ol></details></li></ol></details></li><li class="nodestep-data-entry"><span class="nodestep-data-key">row_count</span><span class="nodestep-data-value nodestep-token-number">10</span></li></ul><details class="nodestep-data-raw"><summary>JSON</summary><ul class="nodestep-data-children"><li class="nodestep-data-entry"><span class="nodestep-data-key">id</span><span class="nodestep-data-value nodestep-token-string">m4</span></li><li class="nodestep-data-entry"><span class="nodestep-data-key">type</span><span class="nodestep-data-value nodestep-token-string">tool</span></li><li class="nodestep-data-entry" data-nodestep-data-echo><span class="nodestep-data-key">name</span><span class="nodestep-data-value nodestep-token-string">run_sql</span></li><li class="nodestep-data-entry"><span class="nodestep-data-key">tool_call_id</span><span class="nodestep-data-value nodestep-token-string">call_1</span></li><li class="nodestep-data-entry" data-nodestep-data-echo><span class="nodestep-data-key">content</span><span class="nodestep-data-value nodestep-token-string">{&#34;columns&#34;: [&#34;product&#34;, &#34;units&#34;], &#34;rows&#34;: [[&#34;Salted caramel bar&#34;, 258], [&#34;Dark chocolate 70%&#34;, 233]], &#34;row_count&#34;: 10}</span></li></ul></details></div></details></li><li class="nodestep-data-message"><details class="nodestep-data-message-row"><summary class="nodestep-data-message-head"><span class="nodestep-data-role nodestep-data-role-ai">ai</span><span class="nodestep-data-preview"><span class="nodestep-data-preview-line nodestep-data-preview-text nodestep-data-preview-short">Salted caramel bar sold the most units, 258, ahead of Dark chocolate 70% with 233. The other eight products sold between 120 and 225 units each.</span></span></summary><div class="nodestep-data-message-body"><p class="nodestep-data-text">Salted caramel bar sold the most units, 258, ahead of Dark chocolate 70% with 233.
+The other eight products sold between 120 and 225 units each.</p><details class="nodestep-data-raw"><summary>JSON</summary><ul class="nodestep-data-children"><li class="nodestep-data-entry"><span class="nodestep-data-key">id</span><span class="nodestep-data-value nodestep-token-string">m5</span></li><li class="nodestep-data-entry"><span class="nodestep-data-key">type</span><span class="nodestep-data-value nodestep-token-string">ai</span></li><li class="nodestep-data-entry" data-nodestep-data-echo><span class="nodestep-data-key">content</span><span class="nodestep-data-value nodestep-token-string">Salted caramel bar sold the most units, 258, ahead of Dark chocolate 70% with 233.
+The other eight products sold between 120 and 225 units each.</span></li></ul></details></div></details></li></ol></details></li></ul></div><pre class="nodestep-data-source">{
+  &#34;question&#34;: &#34;Which ten products sold the most units?&#34;,
+  &#34;attempts&#34;: 1,
+  &#34;approved&#34;: true,
+  &#34;error&#34;: null,
+  &#34;tags&#34;: [],
+  &#34;result&#34;: {
+    &#34;columns&#34;: [
+      &#34;product&#34;,
+      &#34;units&#34;
+    ],
+    &#34;rows&#34;: [
+      [
+        &#34;Salted caramel bar&#34;,
+        258
+      ],
+      [
+        &#34;Dark chocolate 70%&#34;,
+        233
+      ]
+    ],
+    &#34;stores&#34;: [
+      {
+        &#34;name&#34;: &#34;Vienna Neubau&#34;,
+        &#34;orders&#34;: 180
+      }
+    ]
+  },
+  &#34;messages&#34;: [
+    {
+      &#34;id&#34;: &#34;m1&#34;,
+      &#34;type&#34;: &#34;system&#34;,
+      &#34;content&#34;: &#34;Answer questions about demo_shop with SQL. List the tables first and check the column names before you write a query. Count only completed orders unless the question says otherwise, and explain each result in two or three plain sentences that name the numbers.&#34;
+    },
+    {
+      &#34;id&#34;: &#34;m2&#34;,
+      &#34;type&#34;: &#34;human&#34;,
+      &#34;content&#34;: &#34;Which ten products sold the most units?&#34;
+    },
+    {
+      &#34;id&#34;: &#34;m3&#34;,
+      &#34;type&#34;: &#34;ai&#34;,
+      &#34;content&#34;: null,
+      &#34;tool_calls&#34;: [
+        {
+          &#34;id&#34;: &#34;call_1&#34;,
+          &#34;name&#34;: &#34;run_sql&#34;,
+          &#34;arguments&#34;: {
+            &#34;sql&#34;: &#34;SELECT p.name AS product, SUM(i.quantity) AS units FROM order_items AS i JOIN products AS p ON p.product_id = i.product_id GROUP BY p.product_id ORDER BY units DESC LIMIT 10&#34;
+          }
+        }
+      ]
+    },
+    {
+      &#34;id&#34;: &#34;m4&#34;,
+      &#34;type&#34;: &#34;tool&#34;,
+      &#34;name&#34;: &#34;run_sql&#34;,
+      &#34;tool_call_id&#34;: &#34;call_1&#34;,
+      &#34;content&#34;: &#34;{\&#34;columns\&#34;: [\&#34;product\&#34;, \&#34;units\&#34;], \&#34;rows\&#34;: [[\&#34;Salted caramel bar\&#34;, 258], [\&#34;Dark chocolate 70%\&#34;, 233]], \&#34;row_count\&#34;: 10}&#34;
+    },
+    {
+      &#34;id&#34;: &#34;m5&#34;,
+      &#34;type&#34;: &#34;ai&#34;,
+      &#34;content&#34;: &#34;Salted caramel bar sold the most units, 258, ahead of Dark chocolate 70% with 233.\nThe other eight products sold between 120 and 225 units each.&#34;
+    }
+  ]
+}</pre></div>
+      </div>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;div class="nodestep-data" role="group" aria-label="the run state"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;div class="nodestep-data-toolbar"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;input class="nodestep-input nodestep-data-search" type="search" placeholder="Search keys and values" aria-label="Search the run state"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;span class="nodestep-data-matches" aria-live="polite"&gt;&lt;/span&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;button class="nodestep-button nodestep-button-quiet nodestep-button-small" type="button" data-nodestep-data-action="expand"&gt;Expand all&lt;/button&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;button class="nodestep-button nodestep-button-quiet nodestep-button-small" type="button" data-nodestep-data-action="collapse"&gt;Collapse all&lt;/button&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;button class="nodestep-button nodestep-button-quiet nodestep-button-small" type="button" data-nodestep-data-action="copy"&gt;Copy JSON&lt;/button&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;div class="nodestep-data-tree"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;ul class="nodestep-data-children"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;li class="nodestep-data-entry"&gt;&lt;span class="nodestep-data-key"&gt;question&lt;/span&gt;&lt;span class="nodestep-data-value nodestep-token-string"&gt;Which ten products sold the most units?&lt;/span&gt;&lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;li class="nodestep-data-entry"&gt;&lt;span class="nodestep-data-key"&gt;attempts&lt;/span&gt;&lt;span class="nodestep-data-value nodestep-token-number"&gt;1&lt;/span&gt;&lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;li class="nodestep-data-entry"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;details class="nodestep-data-node" open&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 10">          &lt;summary&gt;&lt;span class="nodestep-data-key"&gt;columns&lt;/span&gt;&lt;span class="nodestep-data-size"&gt;2 items&lt;/span&gt;&lt;/summary&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 10">          &lt;ol class="nodestep-data-children"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 12">            &lt;li class="nodestep-data-entry"&gt;&lt;span class="nodestep-data-index"&gt;0&lt;/span&gt;&lt;span class="nodestep-data-value nodestep-token-string"&gt;product&lt;/span&gt;&lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 12">            &lt;li class="nodestep-data-entry"&gt;&lt;span class="nodestep-data-index"&gt;1&lt;/span&gt;&lt;span class="nodestep-data-value nodestep-token-string"&gt;units&lt;/span&gt;&lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 10">          &lt;/ol&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;/details&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;li class="nodestep-data-entry"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;details class="nodestep-data-node" open&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 10">          &lt;summary&gt;&lt;span class="nodestep-data-key"&gt;messages&lt;/span&gt;&lt;span class="nodestep-data-size"&gt;4 messages&lt;/span&gt;&lt;/summary&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 10">          &lt;ol class="nodestep-data-messages"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 12">            &lt;li class="nodestep-data-message"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 14">              &lt;details class="nodestep-data-message-row"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 16">                &lt;summary class="nodestep-data-message-head"&gt;&lt;span class="nodestep-data-role nodestep-data-role-system"&gt;system&lt;/span&gt;&lt;span class="nodestep-data-preview"&gt;&lt;span class="nodestep-data-preview-line nodestep-data-preview-text"&gt;Answer questions about demo_shop with SQL. List the tables first ...&lt;/span&gt;&lt;/span&gt;&lt;/summary&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 16">                &lt;div class="nodestep-data-message-body"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 18">                  &lt;p class="nodestep-data-text"&gt;Answer questions about demo_shop with SQL. List the tables first ...&lt;/p&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 18">                  &lt;details class="nodestep-data-raw"&gt;&lt;summary&gt;JSON&lt;/summary&gt;&lt;ul class="nodestep-data-children"&gt;...&lt;/ul&gt;&lt;/details&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 16">                &lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 14">              &lt;/details&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 12">            &lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 12">            &lt;li class="nodestep-data-message"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 14">              &lt;details class="nodestep-data-message-row"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 16">                &lt;summary class="nodestep-data-message-head"&gt;&lt;span class="nodestep-data-role nodestep-data-role-human"&gt;human&lt;/span&gt;&lt;span class="nodestep-data-preview"&gt;&lt;span class="nodestep-data-preview-line nodestep-data-preview-text nodestep-data-preview-short"&gt;Which ten products sold the most units?&lt;/span&gt;&lt;/span&gt;&lt;/summary&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 16">                &lt;div class="nodestep-data-message-body"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 18">                  &lt;p class="nodestep-data-text"&gt;Which ten products sold the most units?&lt;/p&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 18">                  &lt;details class="nodestep-data-raw"&gt;&lt;summary&gt;JSON&lt;/summary&gt;&lt;ul class="nodestep-data-children"&gt;...&lt;/ul&gt;&lt;/details&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 16">                &lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 14">              &lt;/details&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 12">            &lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 12">            &lt;li class="nodestep-data-message"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 14">              &lt;details class="nodestep-data-message-row"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 16">                &lt;summary class="nodestep-data-message-head"&gt;&lt;span class="nodestep-data-role nodestep-data-role-ai"&gt;ai&lt;/span&gt;&lt;span class="nodestep-data-preview"&gt;&lt;span class="nodestep-data-preview-line"&gt;run_sql(sql: "SELECT p.name AS product, SUM(i.quantity) AS units ...")&lt;/span&gt;&lt;/span&gt;&lt;/summary&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 16">                &lt;div class="nodestep-data-message-body"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 18">                  &lt;ul class="nodestep-data-calls"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 20">                    &lt;li class="nodestep-data-call"&gt;&lt;span class="nodestep-data-call-name"&gt;run_sql&lt;/span&gt;&lt;span class="nodestep-data-call-arguments"&gt;{"sql": "SELECT p.name AS product, SUM(i.quantity) AS units ..."}&lt;/span&gt;&lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 18">                  &lt;/ul&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 18">                  &lt;details class="nodestep-data-raw"&gt;&lt;summary&gt;JSON&lt;/summary&gt;&lt;ul class="nodestep-data-children"&gt;...&lt;/ul&gt;&lt;/details&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 16">                &lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 14">              &lt;/details&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 12">            &lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 12">            &lt;li class="nodestep-data-message"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 14">              &lt;details class="nodestep-data-message-row"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 16">                &lt;summary class="nodestep-data-message-head"&gt;&lt;span class="nodestep-data-role nodestep-data-role-tool"&gt;tool&lt;/span&gt;&lt;span class="nodestep-data-message-name"&gt;run_sql&lt;/span&gt;&lt;span class="nodestep-data-preview"&gt;&lt;span class="nodestep-data-preview-line"&gt;columns: ["product", "units"], rows: ...&lt;/span&gt;&lt;/span&gt;&lt;/summary&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 16">                &lt;div class="nodestep-data-message-body"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 18">                  &lt;ul class="nodestep-data-children"&gt;...&lt;/ul&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 18">                  &lt;details class="nodestep-data-raw"&gt;&lt;summary&gt;JSON&lt;/summary&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 20">                    &lt;ul class="nodestep-data-children"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 22">                      &lt;li class="nodestep-data-entry"&gt;&lt;span class="nodestep-data-key"&gt;tool_call_id&lt;/span&gt;&lt;span class="nodestep-data-value nodestep-token-string"&gt;call_1&lt;/span&gt;&lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 22">                      &lt;li class="nodestep-data-entry" data-nodestep-data-echo&gt;&lt;span class="nodestep-data-key"&gt;content&lt;/span&gt;&lt;span class="nodestep-data-value nodestep-token-string"&gt;{"columns": ["product", "units"], ...}&lt;/span&gt;&lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 20">                    &lt;/ul&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 18">                  &lt;/details&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 16">                &lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 14">              &lt;/details&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 12">            &lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 10">          &lt;/ol&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;/details&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;/ul&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;pre class="nodestep-data-source"&gt;{"question": "Which ten products sold the most units?", ...}&lt;/pre&gt;</span><span class="nodestep-code-line">&lt;/div&gt;</span></code></pre></div>
+      </details>
+      <p class="nodestep-lead"><code>nodestep-data.js</code> runs in <code>&lt;head&gt;</code> without <code>defer</code>. It sets <code>data-nodestep-data</code> on <code>&lt;html&gt;</code>, which shows the toolbars, and listens on the document, so viewers added to the page later work as well. The search skips the entries of a message's JSON marked <code>data-nodestep-data-echo</code>, which repeat what the row shows. It writes no styles and no markup strings, so it works under a Content-Security-Policy with <code>script-src 'self'</code>.</p>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;head&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;script src="nodestep-theme.js"&gt;&lt;/script&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;script src="nodestep-data.js"&gt;&lt;/script&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;link rel="stylesheet" href="nodestep.css"&gt;</span><span class="nodestep-code-line">&lt;/head&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="status" aria-labelledby="status-title">
+      <h2 id="status-title">Status</h2>
+      <p class="nodestep-lead">Each status has its own label and mark, so none relies on color alone. The running ring stops turning when reduced motion is on.</p>
+      <div class="nodestep-cluster">
+        <span class="nodestep-badge nodestep-badge-completed">Completed</span>
+        <span class="nodestep-badge nodestep-badge-running">Running</span>
+        <span class="nodestep-badge nodestep-badge-paused">Paused</span>
+        <span class="nodestep-badge nodestep-badge-stopped">Stopped</span>
+        <span class="nodestep-badge nodestep-badge-failed">Failed</span>
+      </div>
+      <div class="nodestep-cluster">
+        <span class="nodestep-tag">node</span>
+        <span class="nodestep-tag">tool</span>
+        <span class="nodestep-tag nodestep-tag-model">model</span>
+        <span class="nodestep-tag">resumed</span>
+        <span class="nodestep-tag nodestep-tag-wrap">resumed: Online orders from 2025, without the ones that were returned</span>
+      </div>
+      <p class="nodestep-hint"><span class="nodestep-spinner" aria-hidden="true"></span> Loading the thread…</p>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;span class="nodestep-badge nodestep-badge-completed"&gt;Completed&lt;/span&gt;</span><span class="nodestep-code-line">&lt;span class="nodestep-badge nodestep-badge-running"&gt;Running&lt;/span&gt;</span><span class="nodestep-code-line">&lt;span class="nodestep-badge nodestep-badge-paused"&gt;Paused&lt;/span&gt;</span><span class="nodestep-code-line">&lt;span class="nodestep-badge nodestep-badge-stopped"&gt;Stopped&lt;/span&gt;</span><span class="nodestep-code-line">&lt;span class="nodestep-badge nodestep-badge-failed"&gt;Failed&lt;/span&gt;</span><span class="nodestep-code-line">&lt;span class="nodestep-tag"&gt;node&lt;/span&gt;</span><span class="nodestep-code-line">&lt;span class="nodestep-tag nodestep-tag-model"&gt;model&lt;/span&gt;</span><span class="nodestep-code-line">&lt;span class="nodestep-tag nodestep-tag-wrap"&gt;resumed: a long answer that may wrap&lt;/span&gt;</span><span class="nodestep-code-line">&lt;p class="nodestep-hint"&gt;&lt;span class="nodestep-spinner" aria-hidden="true"&gt;&lt;/span&gt; Loading the thread…&lt;/p&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="timeline" aria-labelledby="timeline-title">
+      <h2 id="timeline-title">Timeline</h2>
+      <p class="nodestep-lead">Bars are SVG rectangles on a 0 to 1000 scale, so they need no inline styles and work under a strict Content-Security-Policy. Indent spacers draw the span tree.</p>
+      <ol class="nodestep-timeline" aria-label="Spans of the run">
+        <li class="nodestep-timeline-head" aria-hidden="true">
+          <span class="nodestep-timeline-name">Span</span>
+          <span class="nodestep-timeline-meta">Tokens in / out</span>
+          <span class="nodestep-timeline-duration">Duration</span>
+          <span>Timeline</span>
+        </li>
+        <li class="nodestep-timeline-row">
+          <span class="nodestep-timeline-name"><a href="#timeline">nodestep.graph text-to-sql-demo</a><span class="nodestep-badge nodestep-badge-paused">Paused</span></span>
+          <span class="nodestep-timeline-meta">1,840 / 212</span>
+          <span class="nodestep-timeline-duration">1.34 s</span>
+          <svg class="nodestep-timeline-track" viewBox="0 0 1000 10" preserveAspectRatio="none" role="img" aria-label="Starts at 0 ms, takes 1.34 s"><rect class="nodestep-timeline-bar" x="0" y="0" width="1000" height="10"></rect></svg>
+        </li>
+        <li class="nodestep-timeline-row">
+          <span class="nodestep-timeline-name"><span class="nodestep-timeline-indent"></span><a href="#timeline">nodestep.node think</a><span class="nodestep-tag">node</span></span>
+          <span class="nodestep-timeline-meta"></span>
+          <span class="nodestep-timeline-duration">152.3 ms</span>
+          <svg class="nodestep-timeline-track" viewBox="0 0 1000 10" preserveAspectRatio="none" role="img" aria-label="Starts at 1 ms, takes 152.3 ms"><rect class="nodestep-timeline-bar" x="1" y="0" width="114" height="10"></rect></svg>
+        </li>
+        <li class="nodestep-timeline-row nodestep-timeline-model" aria-current="true">
+          <span class="nodestep-timeline-name"><span class="nodestep-timeline-indent"></span><span class="nodestep-timeline-indent"></span><a href="#timeline">chat gpt-6-luna</a><span class="nodestep-tag nodestep-tag-model">model</span></span>
+          <span class="nodestep-timeline-meta">1,840 / 212</span>
+          <span class="nodestep-timeline-duration">151.4 ms</span>
+          <svg class="nodestep-timeline-track" viewBox="0 0 1000 10" preserveAspectRatio="none" role="img" aria-label="Starts at 1 ms, takes 151.4 ms"><rect class="nodestep-timeline-bar" x="1" y="0" width="113" height="10"></rect></svg>
+        </li>
+        <li class="nodestep-timeline-row">
+          <span class="nodestep-timeline-name"><span class="nodestep-timeline-indent"></span><a href="#timeline">nodestep.node act</a><span class="nodestep-tag">node</span></span>
+          <span class="nodestep-timeline-meta"></span>
+          <span class="nodestep-timeline-duration">14.3 ms</span>
+          <svg class="nodestep-timeline-track" viewBox="0 0 1000 10" preserveAspectRatio="none" role="img" aria-label="Starts at 153 ms, takes 14.3 ms"><rect class="nodestep-timeline-bar" x="115" y="0" width="11" height="10"></rect></svg>
+        </li>
+        <li class="nodestep-timeline-row nodestep-timeline-failed">
+          <span class="nodestep-timeline-name"><span class="nodestep-timeline-indent"></span><span class="nodestep-timeline-indent"></span><a href="#timeline">execute_tool run_sql</a><span class="nodestep-badge nodestep-badge-failed">Failed</span></span>
+          <span class="nodestep-timeline-meta"></span>
+          <span class="nodestep-timeline-duration">13.4 ms</span>
+          <svg class="nodestep-timeline-track" viewBox="0 0 1000 10" preserveAspectRatio="none" role="img" aria-label="Starts at 154 ms, takes 13.4 ms, failed"><rect class="nodestep-timeline-bar" x="116" y="0" width="10" height="10"></rect></svg>
+        </li>
+        <li class="nodestep-timeline-row nodestep-timeline-paused">
+          <span class="nodestep-timeline-name"><span class="nodestep-timeline-indent"></span><a href="#timeline">nodestep.node ask_user</a><span class="nodestep-badge nodestep-badge-paused">Paused</span></span>
+          <span class="nodestep-timeline-meta"></span>
+          <span class="nodestep-timeline-duration">832.1 ms</span>
+          <svg class="nodestep-timeline-track" viewBox="0 0 1000 10" preserveAspectRatio="none" role="img" aria-label="Starts at 520 ms, takes 832.1 ms, paused"><rect class="nodestep-timeline-bar" x="380" y="0" width="620" height="10"></rect></svg>
+        </li>
+      </ol>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;ol class="nodestep-timeline" aria-label="Spans of the trace"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;li class="nodestep-timeline-head" aria-hidden="true"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;span class="nodestep-timeline-name"&gt;Span&lt;/span&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;span class="nodestep-timeline-meta"&gt;Tokens in / out&lt;/span&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;span class="nodestep-timeline-duration"&gt;Duration&lt;/span&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;li class="nodestep-timeline-row nodestep-timeline-model" aria-current="true"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;span class="nodestep-timeline-name"&gt;&lt;span class="nodestep-timeline-indent"&gt;&lt;/span&gt;&lt;a href="/spans/b65d"&gt;chat gpt-6-luna&lt;/a&gt;&lt;span class="nodestep-tag nodestep-tag-model"&gt;model&lt;/span&gt;&lt;/span&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;span class="nodestep-timeline-meta"&gt;1,840 / 212&lt;/span&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;span class="nodestep-timeline-duration"&gt;151.4 ms&lt;/span&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;svg class="nodestep-timeline-track" viewBox="0 0 1000 10" preserveAspectRatio="none" role="img" aria-label="Starts at 1 ms, takes 151.4 ms"&gt;&lt;rect class="nodestep-timeline-bar" x="1" y="0" width="113" height="10"&gt;&lt;/rect&gt;&lt;/svg&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;li class="nodestep-timeline-row nodestep-timeline-paused"&gt;...&lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;li class="nodestep-timeline-row nodestep-timeline-failed"&gt;...&lt;/li&gt;</span><span class="nodestep-code-line">&lt;/ol&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="cards" aria-labelledby="cards-title">
+      <h2 id="cards-title">Questions and approvals</h2>
+      <p class="nodestep-lead">A card waiting for an answer carries the accent. An answered card shows the answer in one <code>nodestep-answer</code> block: the chosen proposal with its description, or the text that was typed.</p>
+      <div class="nodestep-stack">
+        <section class="nodestep-card nodestep-card-waiting" tabindex="-1" aria-labelledby="question-title">
+          <p class="nodestep-card-label">Question from the agent</p>
+          <h3 class="nodestep-card-title" id="question-title">How should revenue be counted?</h3>
+          <ul class="nodestep-choices">
+            <li><button class="nodestep-choice" type="button"><span class="nodestep-choice-label">Gross revenue</span><span class="nodestep-choice-description">Sum of quantity times price after discount, completed orders.</span></button></li>
+            <li><button class="nodestep-choice" type="button"><span class="nodestep-choice-label">Net of refunds</span><span class="nodestep-choice-description">Gross revenue minus the refunds paid for returned items.</span></button></li>
+            <li><button class="nodestep-choice" type="button"><span class="nodestep-choice-label">Share of total</span><span class="nodestep-choice-description">Each category's gross revenue as a percentage of all revenue.</span></button></li>
+          </ul>
+          <div class="nodestep-field">
+            <label class="nodestep-label" for="question-free-text">Or describe what you mean</label>
+            <div class="nodestep-input-row">
+              <input class="nodestep-input" id="question-free-text" type="text">
+              <button class="nodestep-button nodestep-button-primary" type="button">Send answer</button>
+            </div>
+          </div>
+        </section>
+        <section class="nodestep-card nodestep-card-waiting" aria-labelledby="approval-title">
+          <p class="nodestep-card-label">Approval needed</p>
+          <h3 class="nodestep-card-title" id="approval-title">Refund €42.50 for order 1187?</h3>
+          <p class="nodestep-card-body">The tool <code>issue_refund</code> runs only after you approve it. Denying it tells the agent the refund was refused.</p>
+          <div class="nodestep-card-actions">
+            <button class="nodestep-button nodestep-button-primary" type="button">Approve refund</button>
+            <button class="nodestep-button nodestep-button-danger" type="button">Deny refund</button>
+          </div>
+        </section>
+        <section class="nodestep-card nodestep-card-answered" aria-labelledby="answered-title">
+          <p class="nodestep-card-label">Answered</p>
+          <h3 class="nodestep-card-title" id="answered-title">How should revenue be counted?</h3>
+          <div class="nodestep-answer">
+            <p class="nodestep-answer-label">Your answer</p>
+            <p class="nodestep-answer-text">Net of refunds</p>
+            <p class="nodestep-answer-detail">Gross revenue minus the refunds paid for returned items.</p>
+          </div>
+        </section>
+        <section class="nodestep-card nodestep-card-answered" aria-labelledby="answered-text-title">
+          <p class="nodestep-card-label">Answered</p>
+          <h3 class="nodestep-card-title" id="answered-text-title">Which orders should the report include?</h3>
+          <div class="nodestep-answer">
+            <p class="nodestep-answer-label">Your answer</p>
+            <p class="nodestep-answer-text">Online orders from 2025, without the ones that were returned</p>
+          </div>
+        </section>
+        <section class="nodestep-card nodestep-card-completed" aria-labelledby="completed-title">
+          <h3 class="nodestep-card-title" id="completed-title">Completed</h3>
+          <p class="nodestep-card-body">The run ended after 6 steps.</p>
+        </section>
+        <section class="nodestep-card nodestep-card-failed" aria-labelledby="failed-title">
+          <h3 class="nodestep-card-title" id="failed-title">Failed</h3>
+          <p class="nodestep-message nodestep-message-error">fetch_invoice raised KeyError: 'customer_id'</p>
+        </section>
+      </div>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;section class="nodestep-card nodestep-card-waiting" tabindex="-1" aria-labelledby="question"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;p class="nodestep-card-label"&gt;Question from the agent&lt;/p&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;h3 class="nodestep-card-title" id="question"&gt;How should revenue be counted?&lt;/h3&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;ul class="nodestep-choices"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;li&gt;&lt;button class="nodestep-choice" type="button"&gt;&lt;span class="nodestep-choice-label"&gt;Gross revenue&lt;/span&gt;&lt;span class="nodestep-choice-description"&gt;Sum of quantity times price.&lt;/span&gt;&lt;/button&gt;&lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/ul&gt;</span><span class="nodestep-code-line">&lt;/section&gt;</span><span class="nodestep-code-line">&lt;section class="nodestep-card nodestep-card-waiting" aria-labelledby="approval"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;p class="nodestep-card-label"&gt;Approval needed&lt;/p&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;h3 class="nodestep-card-title" id="approval"&gt;Refund 42.50 for order 1187?&lt;/h3&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;p class="nodestep-card-body"&gt;The tool runs only after you approve it.&lt;/p&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;div class="nodestep-card-actions"&gt;&lt;button class="nodestep-button nodestep-button-primary" type="button"&gt;Approve refund&lt;/button&gt;&lt;/div&gt;</span><span class="nodestep-code-line">&lt;/section&gt;</span><span class="nodestep-code-line">&lt;section class="nodestep-card nodestep-card-answered" aria-labelledby="answered"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;p class="nodestep-card-label"&gt;Answered&lt;/p&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;h3 class="nodestep-card-title" id="answered"&gt;How should revenue be counted?&lt;/h3&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;div class="nodestep-answer"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;p class="nodestep-answer-label"&gt;Your answer&lt;/p&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;p class="nodestep-answer-text"&gt;Net of refunds&lt;/p&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;p class="nodestep-answer-detail"&gt;Gross revenue minus the refunds paid for returned items.&lt;/p&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/div&gt;</span><span class="nodestep-code-line">&lt;/section&gt;</span><span class="nodestep-code-line">&lt;section class="nodestep-card nodestep-card-completed"&gt;...&lt;/section&gt;</span><span class="nodestep-code-line">&lt;section class="nodestep-card nodestep-card-failed"&gt;...&lt;/section&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="chat" aria-labelledby="chat-title">
+      <h2 id="chat-title">Chat</h2>
+      <p class="nodestep-lead">A chat is a log that keeps the latest turn in view, and a dock with the question box. The box has one round button: an arrow that sends, or a square that stops the answer while it streams.</p>
+      <div class="nodestep-chat demo-chat">
+        <div class="nodestep-chat-log" role="log" aria-label="Example conversation">
+          <div class="nodestep-page nodestep-page-narrow nodestep-chat-turns">
+            <article class="nodestep-chat-message nodestep-chat-message-user" aria-label="Question">
+              <p class="nodestep-chat-bubble nodestep-chat-text">Which ten products sold the most units?</p>
+              <div class="nodestep-chat-actions">
+                <button class="nodestep-button nodestep-button-quiet nodestep-button-small nodestep-button-icon" type="button" aria-label="Previous version">‹</button>
+                <span class="nodestep-hint">2 / 2</span>
+                <button class="nodestep-button nodestep-button-quiet nodestep-button-small nodestep-button-icon" type="button" aria-label="Next version" aria-disabled="true">›</button>
+                <button class="nodestep-button nodestep-button-quiet nodestep-button-small" type="button">Edit</button>
+              </div>
+            </article>
+            <article class="nodestep-chat-message" aria-label="Answer">
+              <p class="nodestep-chat-text">Salted caramel bar sold the most units: 258 in completed orders. Dark chocolate 70% follows with 233.</p>
+              <section class="nodestep-chips" aria-label="Follow-up questions">
+                <p class="nodestep-chips-label" aria-hidden="true">Follow-up questions</p>
+                <ul class="nodestep-chips-list">
+                  <li><button class="nodestep-chip" type="button">Which store sold the most of it?</button></li>
+                  <li><button class="nodestep-chip" type="button">How did units change by month?</button></li>
+                  <li><button class="nodestep-chip" type="button" aria-disabled="true">Which products sold the least?</button></li>
+                </ul>
+              </section>
+            </article>
+            <article class="nodestep-chat-message nodestep-chat-message-user" aria-label="Question">
+              <form class="nodestep-composer nodestep-composer-stacked">
+                <label class="nodestep-visually-hidden" for="demo-edit">Edit the question</label>
+                <textarea class="nodestep-composer-field" id="demo-edit" rows="3" aria-describedby="demo-edit-hint">Which category brings in the most revenue?</textarea>
+                <div class="nodestep-composer-bar">
+                  <p class="nodestep-hint" id="demo-edit-hint">Enter saves. Shift+Enter adds a line. Escape cancels.</p>
+                  <div class="nodestep-cluster">
+                    <button class="nodestep-button nodestep-button-secondary nodestep-button-small" type="button">Cancel</button>
+                    <button class="nodestep-button nodestep-button-primary nodestep-button-small" type="button">Save</button>
+                  </div>
+                </div>
+              </form>
+            </article>
+            <article class="nodestep-chat-message" aria-label="Answer" aria-busy="true">
+              <p class="nodestep-hint"><span class="nodestep-spinner" aria-hidden="true"></span> Working…</p>
+            </article>
+          </div>
+        </div>
+        <div class="nodestep-chat-dock">
+          <div class="nodestep-page nodestep-page-narrow nodestep-stack nodestep-stack-small">
+            <form class="nodestep-composer">
+              <label class="nodestep-visually-hidden" for="demo-question">Question</label>
+              <textarea class="nodestep-composer-field" id="demo-question" rows="1" placeholder="Ask a question about Demo shop" aria-describedby="demo-question-hint"></textarea>
+              <p class="nodestep-visually-hidden" id="demo-question-hint">Enter sends. Shift+Enter adds a line.</p>
+              <button class="nodestep-composer-send" type="button" aria-label="Send" aria-disabled="true"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 13V3.5M3.75 7.75 8 3.5l4.25 4.25"></path></svg></button>
+            </form>
+            <form class="nodestep-composer">
+              <label class="nodestep-visually-hidden" for="demo-streaming">Question while an answer streams</label>
+              <textarea class="nodestep-composer-field" id="demo-streaming" rows="1">Write a report on sales by store in 2025.</textarea>
+              <button class="nodestep-composer-send" type="button" aria-label="Stop answer"><svg class="nodestep-composer-stop" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="3.5" y="3.5" width="9" height="9" rx="1.5"></rect></svg></button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;div class="nodestep-chat"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;div class="nodestep-chat-log" role="log" aria-label="Conversation"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;div class="nodestep-page nodestep-page-narrow nodestep-chat-turns"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;article class="nodestep-chat-message nodestep-chat-message-user" aria-label="Question"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;p class="nodestep-chat-bubble nodestep-chat-text"&gt;Which ten products sold the most units?&lt;/p&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;div class="nodestep-chat-actions"&gt;&lt;button class="nodestep-button nodestep-button-quiet nodestep-button-small" type="button"&gt;Edit&lt;/button&gt;&lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;/article&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;article class="nodestep-chat-message" aria-label="Answer"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;p class="nodestep-chat-text"&gt;Salted caramel bar sold the most units.&lt;/p&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;section class="nodestep-chips" aria-label="Follow-up questions"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 10">          &lt;p class="nodestep-chips-label" aria-hidden="true"&gt;Follow-up questions&lt;/p&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 10">          &lt;ul class="nodestep-chips-list"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 12">            &lt;li&gt;&lt;button class="nodestep-chip" type="button"&gt;Which store sold the most of it?&lt;/button&gt;&lt;/li&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 10">          &lt;/ul&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 8">        &lt;/section&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;/article&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;div class="nodestep-chat-dock"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;form class="nodestep-page nodestep-page-narrow nodestep-composer"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;label class="nodestep-visually-hidden" for="question"&gt;Question&lt;/label&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;textarea class="nodestep-composer-field" id="question" rows="1"&gt;&lt;/textarea&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;button class="nodestep-composer-send" type="submit" aria-label="Send"&gt;&lt;svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"&gt;&lt;path d="M8 13V3.5M3.75 7.75 8 3.5l4.25 4.25"&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/button&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;/form&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/div&gt;</span><span class="nodestep-code-line">&lt;/div&gt;</span><span class="nodestep-code-line">&lt;button class="nodestep-composer-send" type="button" aria-label="Stop answer"&gt;&lt;svg class="nodestep-composer-stop" viewBox="0 0 16 16" aria-hidden="true" focusable="false"&gt;&lt;rect x="3.5" y="3.5" width="9" height="9" rx="1.5"&gt;&lt;/rect&gt;&lt;/svg&gt;&lt;/button&gt;</span><span class="nodestep-code-line">&lt;form class="nodestep-composer nodestep-composer-stacked"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;textarea class="nodestep-composer-field" rows="3" aria-label="Edit the question"&gt;&lt;/textarea&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;div class="nodestep-composer-bar"&gt;...&lt;/div&gt;</span><span class="nodestep-code-line">&lt;/form&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="charts" aria-labelledby="charts-title">
+      <h2 id="charts-title">Charts</h2>
+      <p class="nodestep-lead">Charts are plain SVG with these classes, so they follow the theme. A <code>nodestep-chart-canvas</code> holds the SVG and a tooltip that your script places at the active point.</p>
+      <div class="nodestep-grid demo-charts">
+        <figure class="nodestep-chart">
+          <figcaption class="nodestep-chart-title">Units sold, top four products</figcaption>
+          <svg viewBox="0 0 560 196" role="img" aria-label="Salted caramel bar 258, Dark chocolate 70% 233, Oat latte 201, Cold brew 1 l 187">
+            <line class="nodestep-chart-grid" x1="260" x2="260" y1="16" y2="164"></line>
+            <line class="nodestep-chart-grid" x1="360" x2="360" y1="16" y2="164"></line>
+            <line class="nodestep-chart-grid" x1="460" x2="460" y1="16" y2="164"></line>
+            <line class="nodestep-chart-axis" x1="160" x2="160" y1="16" y2="164"></line>
+            <text class="nodestep-chart-tick" x="160" y="180" text-anchor="middle">0</text>
+            <text class="nodestep-chart-tick" x="260" y="180" text-anchor="middle">100</text>
+            <text class="nodestep-chart-tick" x="360" y="180" text-anchor="middle">200</text>
+            <text class="nodestep-chart-tick" x="460" y="180" text-anchor="middle">300</text>
+            <text class="nodestep-chart-category" x="150" y="35" text-anchor="end" dominant-baseline="middle">Salted caramel bar</text>
+            <rect class="nodestep-chart-bar nodestep-chart-active" x="160" y="24" width="258" height="22"></rect>
+            <text class="nodestep-chart-value" x="422" y="35" dominant-baseline="middle">258</text>
+            <text class="nodestep-chart-category" x="150" y="71" text-anchor="end" dominant-baseline="middle">Dark chocolate 70%</text>
+            <rect class="nodestep-chart-bar" x="160" y="60" width="233" height="22"></rect>
+            <text class="nodestep-chart-value" x="397" y="71" dominant-baseline="middle">233</text>
+            <text class="nodestep-chart-category" x="150" y="107" text-anchor="end" dominant-baseline="middle">Oat latte</text>
+            <rect class="nodestep-chart-bar" x="160" y="96" width="201" height="22"></rect>
+            <text class="nodestep-chart-value" x="365" y="107" dominant-baseline="middle">201</text>
+            <text class="nodestep-chart-category" x="150" y="143" text-anchor="end" dominant-baseline="middle">Cold brew 1 l</text>
+            <rect class="nodestep-chart-bar" x="160" y="132" width="187" height="22"></rect>
+            <text class="nodestep-chart-value" x="351" y="143" dominant-baseline="middle">187</text>
+          </svg>
+        </figure>
+        <figure class="nodestep-chart">
+          <figcaption class="nodestep-chart-title">Revenue per month, 2025</figcaption>
+          <div class="nodestep-chart-canvas" tabindex="0" role="img" aria-label="Revenue per month: January 12.4k, February 13.1k, March 11.8k, April 14.6k, May 15.2k, June 16.0k">
+            <svg viewBox="0 0 560 220" aria-hidden="true">
+              <line class="nodestep-chart-grid" x1="48" x2="540" y1="24" y2="24"></line>
+              <line class="nodestep-chart-grid" x1="48" x2="540" y1="64" y2="64"></line>
+              <line class="nodestep-chart-grid" x1="48" x2="540" y1="104" y2="104"></line>
+              <line class="nodestep-chart-grid" x1="48" x2="540" y1="144" y2="144"></line>
+              <line class="nodestep-chart-axis" x1="48" x2="540" y1="184" y2="184"></line>
+              <text class="nodestep-chart-axis-title" x="0" y="12">Revenue (k)</text>
+              <text class="nodestep-chart-tick" x="40" y="24" text-anchor="end" dominant-baseline="middle">18</text>
+              <text class="nodestep-chart-tick" x="40" y="64" text-anchor="end" dominant-baseline="middle">16</text>
+              <text class="nodestep-chart-tick" x="40" y="104" text-anchor="end" dominant-baseline="middle">14</text>
+              <text class="nodestep-chart-tick" x="40" y="144" text-anchor="end" dominant-baseline="middle">12</text>
+              <text class="nodestep-chart-tick" x="40" y="184" text-anchor="end" dominant-baseline="middle">10</text>
+              <text class="nodestep-chart-tick" x="64" y="202" text-anchor="middle">Jan</text>
+              <text class="nodestep-chart-tick" x="156" y="202" text-anchor="middle">Feb</text>
+              <text class="nodestep-chart-tick" x="248" y="202" text-anchor="middle">Mar</text>
+              <text class="nodestep-chart-tick" x="340" y="202" text-anchor="middle">Apr</text>
+              <text class="nodestep-chart-tick" x="432" y="202" text-anchor="middle">May</text>
+              <text class="nodestep-chart-tick" x="524" y="202" text-anchor="middle">Jun</text>
+              <line class="nodestep-chart-crosshair" x1="340" x2="340" y1="24" y2="184"></line>
+              <path class="nodestep-chart-line" d="M64 136 L156 122 L248 148 L340 92 L432 80 L524 64"></path>
+              <circle class="nodestep-chart-dot" cx="64" cy="136" r="4"></circle>
+              <circle class="nodestep-chart-dot" cx="156" cy="122" r="4"></circle>
+              <circle class="nodestep-chart-dot" cx="248" cy="148" r="4"></circle>
+              <circle class="nodestep-chart-dot nodestep-chart-active" cx="340" cy="92" r="4"></circle>
+              <circle class="nodestep-chart-dot" cx="432" cy="80" r="4"></circle>
+              <circle class="nodestep-chart-dot" cx="524" cy="64" r="4"></circle>
+            </svg>
+            <div class="nodestep-tooltip demo-chart-tooltip" style="left: 60.7%; top: 41.8%"><strong>14.6k</strong><span class="nodestep-hint">April</span></div>
+          </div>
+        </figure>
+      </div>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;figure class="nodestep-chart"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;figcaption class="nodestep-chart-title"&gt;Revenue per month&lt;/figcaption&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;div class="nodestep-chart-canvas" tabindex="0" role="img" aria-label="Revenue per month: ..."&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;svg viewBox="0 0 560 220" aria-hidden="true"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;line class="nodestep-chart-grid" x1="48" x2="540" y1="64" y2="64"&gt;&lt;/line&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;line class="nodestep-chart-axis" x1="48" x2="540" y1="184" y2="184"&gt;&lt;/line&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;text class="nodestep-chart-axis-title" x="0" y="12"&gt;Revenue (k)&lt;/text&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;text class="nodestep-chart-tick" x="40" y="64" text-anchor="end"&gt;16&lt;/text&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;text class="nodestep-chart-category" x="150" y="35" text-anchor="end"&gt;Salted caramel bar&lt;/text&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;rect class="nodestep-chart-bar" x="160" y="24" width="258" height="22"&gt;&lt;/rect&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;text class="nodestep-chart-value" x="422" y="35"&gt;258&lt;/text&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;line class="nodestep-chart-crosshair" x1="340" x2="340" y1="24" y2="184"&gt;&lt;/line&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;path class="nodestep-chart-line" d="M64 136 L156 122 L248 148 L340 92"&gt;&lt;/path&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 6">      &lt;circle class="nodestep-chart-dot nodestep-chart-active" cx="340" cy="92" r="4"&gt;&lt;/circle&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;/svg&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 4">    &lt;div class="nodestep-tooltip"&gt;...&lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;/div&gt;</span><span class="nodestep-code-line">&lt;/figure&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="graph" aria-labelledby="graph-title">
+      <h2 id="graph-title">Graph</h2>
+      <p class="nodestep-lead">The frame restyles Mermaid's output with the tokens, so a diagram follows the theme without being drawn again. Its rules use <code>!important</code> to win over Mermaid's own styles, so an override of yours needs <code>!important</code> too. A trace view adds <code>visited</code>, <code>tool-error</code>, <code>current</code>, <code>paused</code>, <code>stopped</code> and <code>failed</code> to nodes and <code>edge-taken</code> to edges; on a node with several, the last in that list sets the outline.</p>
+      <div class="demo-graphs">
+        <figure>
+          <div class="nodestep-mermaid" data-processed="true">
+            <svg id="demo-graph-running" viewBox="0 0 360 330" role="img" aria-labelledby="demo-graph-running-caption">
+              <defs><marker id="demo-arrow-running" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" orient="auto"><path class="arrowMarkerPath" d="M0,0 L10,5 L0,10 z"></path></marker></defs>
+              <g class="edgePaths">
+                <path class="flowchart-link edge-taken" d="M180,46 V82" fill="none" marker-end="url(#demo-arrow-running)"></path>
+                <path class="flowchart-link" d="M165,126 V152 H90 V176" fill="none" marker-end="url(#demo-arrow-running)"></path>
+                <path class="flowchart-link edge-taken" d="M195,126 V152 H270 V176" fill="none" marker-end="url(#demo-arrow-running)"></path>
+                <path class="flowchart-link" d="M90,220 V246 H165 V270" fill="none" marker-end="url(#demo-arrow-running)"></path>
+                <path class="flowchart-link" d="M270,220 V246 H195 V270" fill="none" marker-end="url(#demo-arrow-running)"></path>
+              </g>
+              <g class="edgeLabels">
+                <g class="edgeLabel"><foreignObject x="58" y="157" width="64" height="16"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg"><span class="edgeLabel"><p>support</p></span></div></foreignObject></g>
+                <g class="edgeLabel"><foreignObject x="246" y="157" width="48" height="16"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg"><span class="edgeLabel"><p>sales</p></span></div></foreignObject></g>
+              </g>
+              <g class="nodes">
+                <g class="node default visited" transform="translate(180,28)"><rect class="basic label-container" x="-50" y="-18" width="100" height="36" rx="18"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">START</text></g></g>
+                <g class="node default visited" transform="translate(180,106)"><rect class="basic label-container" x="-60" y="-20" width="120" height="40" rx="4"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">classify</text></g></g>
+                <g class="node default" transform="translate(90,200)"><rect class="basic label-container" x="-60" y="-20" width="120" height="40" rx="4"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">support</text></g></g>
+                <g class="node default current" transform="translate(270,200)"><rect class="basic label-container" x="-60" y="-20" width="120" height="40" rx="4"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">sales</text></g></g>
+                <g class="node default" transform="translate(180,290)"><rect class="basic label-container" x="-50" y="-18" width="100" height="36" rx="18"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">END</text></g></g>
+              </g>
+            </svg>
+          </div>
+          <figcaption id="demo-graph-running-caption">Running: classify chose sales, which runs now.</figcaption>
+        </figure>
+        <figure>
+          <div class="nodestep-mermaid" data-processed="true">
+            <svg id="demo-graph-paused" viewBox="0 0 220 360" role="img" aria-labelledby="demo-graph-paused-caption">
+              <defs><marker id="demo-arrow-paused" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" orient="auto"><path class="arrowMarkerPath" d="M0,0 L10,5 L0,10 z"></path></marker></defs>
+              <g class="edgePaths">
+                <path class="flowchart-link edge-taken" d="M110,46 V84" fill="none" marker-end="url(#demo-arrow-paused)"></path>
+                <path class="flowchart-link edge-taken" d="M110,126 V162" fill="none" marker-end="url(#demo-arrow-paused)"></path>
+                <path class="flowchart-link" d="M110,204 V240" fill="none" marker-end="url(#demo-arrow-paused)"></path>
+                <path class="flowchart-link" d="M110,282 V320" fill="none" marker-end="url(#demo-arrow-paused)"></path>
+              </g>
+              <g class="nodes">
+                <g class="node default visited" transform="translate(110,28)"><rect class="basic label-container" x="-50" y="-18" width="100" height="36" rx="18"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">START</text></g></g>
+                <g class="node default visited" transform="translate(110,106)"><rect class="basic label-container" x="-75" y="-20" width="150" height="40" rx="4"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">lookup_order</text></g></g>
+                <g class="node default paused" transform="translate(110,184)"><rect class="basic label-container" x="-75" y="-20" width="150" height="40" rx="4"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">approve_refund</text></g></g>
+                <g class="node default" transform="translate(110,262)"><rect class="basic label-container" x="-75" y="-20" width="150" height="40" rx="4"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">issue_refund</text></g></g>
+                <g class="node default" transform="translate(110,338)"><rect class="basic label-container" x="-50" y="-18" width="100" height="36" rx="18"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">END</text></g></g>
+              </g>
+            </svg>
+          </div>
+          <figcaption id="demo-graph-paused-caption">Paused: approve_refund waits for an answer.</figcaption>
+        </figure>
+        <figure>
+          <div class="nodestep-mermaid" data-processed="true">
+            <svg id="demo-graph-failed" viewBox="0 0 220 360" role="img" aria-labelledby="demo-graph-failed-caption">
+              <defs><marker id="demo-arrow-failed" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" orient="auto"><path class="arrowMarkerPath" d="M0,0 L10,5 L0,10 z"></path></marker></defs>
+              <g class="edgePaths">
+                <path class="flowchart-link edge-taken" d="M110,46 V84" fill="none" marker-end="url(#demo-arrow-failed)"></path>
+                <path class="flowchart-link edge-taken" d="M110,126 V162" fill="none" marker-end="url(#demo-arrow-failed)"></path>
+                <path class="flowchart-link" d="M110,204 V240" fill="none" marker-end="url(#demo-arrow-failed)"></path>
+                <path class="flowchart-link" d="M110,282 V320" fill="none" marker-end="url(#demo-arrow-failed)"></path>
+              </g>
+              <g class="nodes">
+                <g class="node default visited" transform="translate(110,28)"><rect class="basic label-container" x="-50" y="-18" width="100" height="36" rx="18"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">START</text></g></g>
+                <g class="node default visited" transform="translate(110,106)"><rect class="basic label-container" x="-75" y="-20" width="150" height="40" rx="4"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">classify</text></g></g>
+                <g class="node default failed" transform="translate(110,184)"><rect class="basic label-container" x="-75" y="-20" width="150" height="40" rx="4"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">fetch_invoice</text></g></g>
+                <g class="node default" transform="translate(110,262)"><rect class="basic label-container" x="-75" y="-20" width="150" height="40" rx="4"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">reply</text></g></g>
+                <g class="node default" transform="translate(110,338)"><rect class="basic label-container" x="-50" y="-18" width="100" height="36" rx="18"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">END</text></g></g>
+              </g>
+            </svg>
+          </div>
+          <figcaption id="demo-graph-failed-caption">Failed: fetch_invoice raised, so the run stopped there.</figcaption>
+        </figure>
+        <figure>
+          <div class="nodestep-mermaid" data-processed="true">
+            <svg id="demo-graph-stopped" viewBox="0 0 220 360" role="img" aria-labelledby="demo-graph-stopped-caption">
+              <defs><marker id="demo-arrow-stopped" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" orient="auto"><path class="arrowMarkerPath" d="M0,0 L10,5 L0,10 z"></path></marker></defs>
+              <g class="edgePaths">
+                <path class="flowchart-link edge-taken" d="M110,46 V84" fill="none" marker-end="url(#demo-arrow-stopped)"></path>
+                <path class="flowchart-link edge-taken" d="M110,126 V162" fill="none" marker-end="url(#demo-arrow-stopped)"></path>
+                <path class="flowchart-link" d="M110,204 V240" fill="none" marker-end="url(#demo-arrow-stopped)"></path>
+                <path class="flowchart-link" d="M110,282 V320" fill="none" marker-end="url(#demo-arrow-stopped)"></path>
+              </g>
+              <g class="nodes">
+                <g class="node default visited" transform="translate(110,28)"><rect class="basic label-container" x="-50" y="-18" width="100" height="36" rx="18"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">START</text></g></g>
+                <g class="node default visited tool-error" transform="translate(110,106)"><rect class="basic label-container" x="-75" y="-20" width="150" height="40" rx="4"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">lookup_order</text></g></g>
+                <g class="node default visited stopped" transform="translate(110,184)"><rect class="basic label-container" x="-75" y="-20" width="150" height="40" rx="4"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">draft_reply</text></g></g>
+                <g class="node default" transform="translate(110,262)"><rect class="basic label-container" x="-75" y="-20" width="150" height="40" rx="4"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">send_reply</text></g></g>
+                <g class="node default" transform="translate(110,338)"><rect class="basic label-container" x="-50" y="-18" width="100" height="36" rx="18"></rect><g class="label"><text class="nodeLabel" text-anchor="middle" dominant-baseline="central">END</text></g></g>
+              </g>
+            </svg>
+          </div>
+          <figcaption id="demo-graph-stopped-caption">Stopped: a tool call in lookup_order failed and the node went on; the run was stopped during draft_reply.</figcaption>
+        </figure>
+      </div>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;pre class="mermaid nodestep-mermaid"&gt;flowchart TD</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  START --&gt; classify</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  classify --&gt;|sales| sales</span><span class="nodestep-code-line">&lt;/pre&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="empty" aria-labelledby="empty-title">
+      <h2 id="empty-title">Empty state</h2>
+      <div class="nodestep-empty">
+        <h3 class="nodestep-empty-title">No traces yet</h3>
+        <p>Send spans to <code>http://127.0.0.1:4318/v1/traces</code>, or instrument a graph with <code>nodeartifact.instrument(graph)</code> and run it.</p>
+        <a class="nodestep-button nodestep-button-secondary nodestep-button-small" href="#timeline">Read how tracing works</a>
+      </div>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;div class="nodestep-empty"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;h2 class="nodestep-empty-title"&gt;No traces yet&lt;/h2&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;p&gt;Send spans to &lt;code&gt;http://127.0.0.1:4318/v1/traces&lt;/code&gt; and run a graph.&lt;/p&gt;</span><span class="nodestep-code-line">&lt;/div&gt;</span></code></pre></div>
+      </details>
+    </section>
+    <section class="nodestep-section" id="messages" aria-labelledby="messages-title">
+      <h2 id="messages-title">Messages and toasts</h2>
+      <p class="nodestep-lead">Inline messages stay next to what they describe. Toasts confirm an action and leave on their own; errors that need a decision belong inline. A tooltip names what a control does, on hover and on focus.</p>
+      <div class="nodestep-stack">
+        <p class="nodestep-message nodestep-message-info">Runs use a copy of graph <code>graph</code> with an in-memory state store, so threads last until the sandbox stops.</p>
+        <p class="nodestep-message nodestep-message-success">Resumed with the answer <strong>Net of refunds</strong>.</p>
+        <p class="nodestep-message nodestep-message-warning">State over 16 KB was shortened. The oldest messages were dropped first.</p>
+        <p class="nodestep-message nodestep-message-error" role="alert">Another answer is still running on this thread. Stop it or wait for it to finish.</p>
+      </div>
+      <div class="nodestep-stack">
+        <div class="nodestep-toast nodestep-toast-success"><span class="nodestep-toast-text">Copied the SQL.</span><button class="nodestep-button nodestep-button-quiet nodestep-button-small" type="button">Dismiss</button></div>
+        <div class="nodestep-toast nodestep-toast-error"><span class="nodestep-toast-text">Could not reach nodeartifact at 127.0.0.1:4318.</span><button class="nodestep-button nodestep-button-quiet nodestep-button-small" type="button">Dismiss</button></div>
+        <div class="nodestep-toast"><span class="nodestep-toast-text">Thread renamed.</span></div>
+      </div>
+      <div class="nodestep-cluster">
+        <button class="nodestep-button nodestep-button-secondary" type="button" id="show-toast">Show a toast</button>
+        <span class="nodestep-tooltip-anchor">
+          <button class="nodestep-button nodestep-button-secondary" type="button" aria-describedby="demo-tooltip">Copy the SQL</button>
+          <span class="nodestep-tooltip" role="tooltip" id="demo-tooltip">Copies the query, not its result</span>
+        </span>
+      </div>
+      <details class="nodestep-details demo-markup">
+        <summary>Markup</summary>
+        <div class="nodestep-code nodestep-code-wrap"><pre><code><span class="nodestep-code-line">&lt;p class="nodestep-message nodestep-message-info"&gt;Runs use an in-memory state store.&lt;/p&gt;</span><span class="nodestep-code-line">&lt;p class="nodestep-message nodestep-message-success"&gt;Resumed with the answer &lt;strong&gt;Net of refunds&lt;/strong&gt;.&lt;/p&gt;</span><span class="nodestep-code-line">&lt;p class="nodestep-message nodestep-message-warning"&gt;State over 16 KB was shortened.&lt;/p&gt;</span><span class="nodestep-code-line">&lt;p class="nodestep-message nodestep-message-error" role="alert"&gt;Another answer is still running on this thread.&lt;/p&gt;</span><span class="nodestep-code-line">&lt;div class="nodestep-toast-region" aria-live="polite"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;div class="nodestep-toast nodestep-toast-success"&gt;&lt;span class="nodestep-toast-text"&gt;Copied the SQL.&lt;/span&gt;&lt;button class="nodestep-button nodestep-button-quiet nodestep-button-small" type="button"&gt;Dismiss&lt;/button&gt;&lt;/div&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;div class="nodestep-toast nodestep-toast-error"&gt;&lt;span class="nodestep-toast-text"&gt;Could not reach nodeartifact.&lt;/span&gt;&lt;/div&gt;</span><span class="nodestep-code-line">&lt;/div&gt;</span><span class="nodestep-code-line">&lt;span class="nodestep-tooltip-anchor"&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;button class="nodestep-button nodestep-button-secondary" type="button" aria-describedby="copy-tip"&gt;Copy the SQL&lt;/button&gt;</span><span class="nodestep-code-line" style="--nodestep-indent: 2">  &lt;span class="nodestep-tooltip" role="tooltip" id="copy-tip"&gt;Copies the query, not its result&lt;/span&gt;</span><span class="nodestep-code-line">&lt;/span&gt;</span></code></pre></div>
+      </details>
+    </section>
+</main>
+</div>
+
+<div class="nodestep-toast-region" aria-live="polite"></div>
+
+    <script>
+      (() => {
+        const root = document.documentElement;
+        const sectionLinks = [...document.querySelectorAll(".demo-sidebar-list a")];
+        const sections = sectionLinks.map((link) => document.querySelector(link.hash));
+        const sectionOffset = parseFloat(getComputedStyle(sections[0]).scrollMarginTop) + 1;
+        const markSection = () => {
+          let current = sections.findLast((section) => section.getBoundingClientRect().top <= sectionOffset) ?? sections[0];
+          if (scrollY + innerHeight >= root.scrollHeight - 1) {
+            const target = sections.find((section) => `#${section.id}` === location.hash);
+            current = target && target.getBoundingClientRect().top >= 0 ? target : sections.at(-1);
+          }
+          sectionLinks.forEach((link, index) => {
+            if (sections[index] === current) link.setAttribute("aria-current", "true");
+            else link.removeAttribute("aria-current");
+          });
+        };
+        markSection();
+        addEventListener("scroll", markSection, { passive: true });
+        addEventListener("resize", markSection);
+        addEventListener("hashchange", markSection);
+
+        const menu = document.querySelector(".demo-menu");
+        const sidebar = document.querySelector("#sections");
+        const openMenu = (open) => {
+          sidebar.toggleAttribute("data-open", open);
+          menu.setAttribute("aria-expanded", String(open));
+        };
+        menu.addEventListener("click", () => openMenu(!sidebar.hasAttribute("data-open")));
+        for (const link of sectionLinks) link.addEventListener("click", () => openMenu(false));
+        document.addEventListener("click", (event) => {
+          if (!event.target.closest("#sections, .demo-menu")) openMenu(false);
+        });
+        addEventListener("keydown", (event) => {
+          if (event.key === "Escape" && sidebar.hasAttribute("data-open")) {
+            openMenu(false);
+            menu.focus();
+          }
+        });
+
+        const search = document.querySelector("header .nodestep-search");
+        const searchField = search.querySelector(".nodestep-search-input");
+        search.addEventListener("submit", (event) => {
+          if (searchField.value.trim()) return;
+          event.preventDefault();
+          searchField.focus();
+        });
+
+        const example = document.querySelector("#demo-app");
+        const toggles = [...example.querySelectorAll(".nodestep-app-toggle")];
+        const openPanel = (panel) => {
+          if (panel) example.dataset.panel = panel;
+          else delete example.dataset.panel;
+          for (const toggle of toggles) toggle.setAttribute("aria-expanded", String(toggle.dataset.opens === panel));
+        };
+        for (const toggle of toggles) {
+          toggle.addEventListener("click", () => openPanel(example.dataset.panel === toggle.dataset.opens ? null : toggle.dataset.opens));
+        }
+        for (const close of example.querySelectorAll(".nodestep-app-close")) {
+          close.addEventListener("click", () => openPanel(null));
+        }
+
+        const region = document.querySelector(".nodestep-toast-region");
+        const showToast = (text, kind) => {
+          const toast = document.createElement("div");
+          toast.className = kind ? `nodestep-toast nodestep-toast-${kind}` : "nodestep-toast";
+          const label = document.createElement("span");
+          label.className = "nodestep-toast-text";
+          label.textContent = text;
+          const dismiss = document.createElement("button");
+          dismiss.className = "nodestep-button nodestep-button-quiet nodestep-button-small";
+          dismiss.type = "button";
+          dismiss.textContent = "Dismiss";
+          dismiss.addEventListener("click", () => toast.remove());
+          toast.append(label, dismiss);
+          region.append(toast);
+          setTimeout(() => toast.remove(), 5000);
+        };
+
+        document.querySelector("#show-toast").addEventListener("click", () => showToast("Thread renamed."));
+
+        for (const button of document.querySelectorAll("[data-copy]")) {
+          button.addEventListener("click", async () => {
+            const text = document.getElementById(button.dataset.copy).textContent;
+            try {
+              await navigator.clipboard.writeText(text);
+              showToast("Copied the SQL.", "success");
+            } catch {
+              showToast("Could not copy. Select the text and copy it by hand.", "error");
+            }
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>
